@@ -13,6 +13,17 @@ const nextConfig = {
   experimental: {
     // Allow Server Actions; needed for some auth flows later.
     serverActions: { allowedOrigins: ['localhost:3000'] },
+    // argon2 is a native module — keep it out of the webpack bundle so it is
+    // required from node_modules at runtime (where node-gyp-build can locate
+    // the prebuilt binary).
+    serverComponentsExternalPackages: ['argon2'],
+    // ...and force its prebuilt .node binaries into the serverless function's
+    // traced output. Next's tracer misses them under pnpm because node-gyp-build
+    // loads them dynamically. Without this the Netlify/Lambda function throws
+    // "No native build was found for platform=linux". Glob covers any version.
+    outputFileTracingIncludes: {
+      '**/*': ['./node_modules/.pnpm/argon2@*/node_modules/argon2/prebuilds/**'],
+    },
   },
   // argon2 ships native bindings; mark it external so Webpack doesn't try to bundle it.
   webpack: (config, { isServer }) => {
