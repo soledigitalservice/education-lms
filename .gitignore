@@ -48,6 +48,8 @@ schema.sql
 seed.sql
 delta-*.sql
 gen-seed-sql.mjs
+seed-demo.mjs
+check-db-table.mjs
 test-pg.mjs
 test-https.mjs
 test-prisma.mjs

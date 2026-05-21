@@ -288,6 +288,41 @@ async function StudentDashboard({ userId }: { userId: string }) {
     }),
   ]);
 
+  // Per-course progress for the "Continuar aprendiendo" cards.
+  const courseIds = activeEnrollments.map((e) => e.course.id);
+  const [lessonsAll, progressAll] = await Promise.all([
+    courseIds.length
+      ? prisma.lesson.findMany({
+          where: {
+            publishedAt: { not: null },
+            module: { courseId: { in: courseIds }, publishedAt: { not: null } },
+          },
+          select: { id: true, position: true, module: { select: { courseId: true, position: true } } },
+        })
+      : Promise.resolve([]),
+    courseIds.length
+      ? prisma.lessonProgress.findMany({
+          where: { studentId: userId, lesson: { module: { courseId: { in: courseIds } } } },
+          select: { lessonId: true, completedAt: true },
+        })
+      : Promise.resolve([]),
+  ]);
+  const completedSet = new Set(
+    progressAll.filter((p) => p.completedAt != null).map((p) => p.lessonId),
+  );
+  const progressByCourse = new Map<
+    string,
+    { total: number; completed: number; nextLessonId: string | null }
+  >();
+  for (const cid of courseIds) {
+    const ls = lessonsAll
+      .filter((l) => l.module.courseId === cid)
+      .sort((a, b) => a.module.position - b.module.position || a.position - b.position);
+    const completed = ls.filter((l) => completedSet.has(l.id)).length;
+    const next = ls.find((l) => !completedSet.has(l.id))?.id ?? null;
+    progressByCourse.set(cid, { total: ls.length, completed, nextLessonId: next });
+  }
+
   return (
     <>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -424,18 +459,51 @@ async function StudentDashboard({ userId }: { userId: string }) {
 
       {activeEnrollments.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold">Tus cursos activos</h2>
+          <h2 className="mb-4 text-lg font-semibold">Continuar aprendiendo</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {activeEnrollments.slice(0, 6).map((e) => (
-              <Link key={e.id} href={`/courses/${e.course.slug}`}>
-                <Card className="h-full transition hover:border-brand-300 hover:shadow-md">
+            {activeEnrollments.slice(0, 6).map((e) => {
+              const p = progressByCourse.get(e.course.id) ?? {
+                total: 0,
+                completed: 0,
+                nextLessonId: null,
+              };
+              const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+              const done = p.total > 0 && p.completed >= p.total;
+              const href = p.nextLessonId
+                ? `/courses/${e.course.slug}/lessons/${p.nextLessonId}`
+                : `/courses/${e.course.slug}`;
+              const cta = done ? 'Repasar curso' : p.completed > 0 ? 'Continuar' : 'Empezar';
+              return (
+                <Card key={e.id} className="flex h-full flex-col">
                   <CardTitle>{e.course.title}</CardTitle>
-                  <p className="mt-2 text-xs text-slate-500">
-                    Prof. {e.course.teacher.fullName}
-                  </p>
+                  <p className="mt-1 text-xs text-slate-500">Prof. {e.course.teacher.fullName}</p>
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>
+                        {p.total > 0 ? `${p.completed}/${p.total} lecciones` : 'Sin lecciones aún'}
+                      </span>
+                      <span className="font-medium">{pct}%</span>
+                    </div>
+                    <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                      <div
+                        className="h-full rounded-full bg-emerald-500 transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1" />
+                  <Link href={href} className="mt-4">
+                    <Button
+                      variant={done ? 'secondary' : 'primary'}
+                      size="sm"
+                      className="w-full justify-center"
+                    >
+                      {cta}
+                    </Button>
+                  </Link>
                 </Card>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
