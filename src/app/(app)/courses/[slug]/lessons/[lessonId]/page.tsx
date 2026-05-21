@@ -17,6 +17,7 @@ import { AssignmentPanelTeacher } from './assignment-panel-teacher';
 import { AssignmentPanelStudent } from './assignment-panel-student';
 import { QuizPanelTeacher } from './quiz-panel-teacher';
 import { QuizPanelStudent } from './quiz-panel-student';
+import { LessonProgressTracker } from './lesson-progress-tracker';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +47,17 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   const canManage = user.role === Roles.ADMIN || course.teacher.id === user.id;
 
+  // Student-only progress: is this lesson already marked complete?
+  const isStudent = user.role === Roles.STUDENT;
+  let initialCompleted = false;
+  if (isStudent) {
+    const prog = await prisma.lessonProgress.findUnique({
+      where: { lessonId_studentId: { lessonId: lesson.id, studentId: user.id } },
+      select: { completedAt: true },
+    });
+    initialCompleted = prog?.completedAt != null;
+  }
+
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
@@ -67,6 +79,10 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
+          {isStudent && (
+            <LessonProgressTracker lessonId={lesson.id} initialCompleted={initialCompleted} />
+          )}
+
           {canManage ? (
             <Card>
               <CardTitle>Contenido</CardTitle>

@@ -69,6 +69,10 @@ export default async function CourseAnalyticsPage({ params }: PageProps) {
         <EnrollmentWeekly data={data} />
       </section>
 
+      <section className="mt-8">
+        <LessonCompletion data={data} />
+      </section>
+
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <LiveAttendance data={data} />
         <ActivityChart data={data} />
@@ -94,9 +98,9 @@ function KpiGrid({ data }: { data: CourseAnalytics }) {
         label="Finalización media"
         value={o.avgCompletionPct == null ? '—' : `${o.avgCompletionPct}%`}
         subtitle={
-          o.gradeableItems === 0
-            ? 'Sin evaluaciones publicadas'
-            : `${o.fullyComplete} al 100% · ${o.gradeableItems} evaluaciones`
+          o.publishedLessons === 0
+            ? 'Sin lecciones publicadas'
+            : `${o.fullyComplete} al 100% · ${o.publishedLessons} lecciones`
         }
       />
       <Kpi
@@ -307,6 +311,50 @@ function EvaluationsTable({ data }: { data: CourseAnalytics }) {
             </tbody>
           </table>
         </div>
+      )}
+    </Card>
+  );
+}
+
+// ===========================================================================
+//  Per-lesson completion (drop-off view)
+// ===========================================================================
+
+function LessonCompletion({ data }: { data: CourseAnalytics }) {
+  return (
+    <Card>
+      <CardTitle>Progreso por lección</CardTitle>
+      <CardDescription className="mt-1">
+        Porcentaje de los {data.activeStudents} alumno(s) activo(s) que han completado cada
+        lección, en orden de currículum. Útil para ver dónde se atascan o abandonan.
+      </CardDescription>
+      {data.lessonProgress.length === 0 ? (
+        <EmptyHint>No hay lecciones publicadas todavía.</EmptyHint>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {data.lessonProgress.map((l, i) => (
+            <li key={l.id}>
+              <div className="flex items-center justify-between gap-2 text-sm">
+                <span className="min-w-0 flex-1 truncate">
+                  <span className="mr-2 font-mono text-xs text-slate-400">{i + 1}</span>
+                  {l.title}
+                </span>
+                <span className="shrink-0 text-xs text-slate-500">
+                  {l.completed}/{data.activeStudents} ({l.completionPct}%)
+                  {l.viewed > l.completed && (
+                    <span className="ml-1 text-slate-400">· {l.viewed} vista(s)</span>
+                  )}
+                </span>
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{ width: `${l.completionPct}%` }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </Card>
   );

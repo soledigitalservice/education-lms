@@ -9,6 +9,7 @@ import { ApiError } from '@/lib/api/errors';
 import { ModulesService, type ModuleDto } from '@/lib/modules/service';
 import { LessonsService, type LessonDto } from '@/lib/lessons/service';
 import { MaterialsService, type MaterialDto } from '@/lib/materials/service';
+import { LessonProgressService, type LessonProgressDto } from '@/lib/lesson-progress/service';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -92,6 +93,20 @@ export default async function CourseDetailPage({ params }: PageProps) {
   }
   const hasContent = moduleRows.some((m) => (lessonsByModule[m.id]?.length ?? 0) > 0);
 
+  // Student progress across this course (for checkmarks + a progress bar).
+  let progressMap = new Map<string, LessonProgressDto>();
+  if (enrolledAsStudent) {
+    progressMap = await new LessonProgressService(prisma).mapForCourseStudent(course.id, user.id);
+  }
+  const visibleLessons = Object.values(lessonsByModule).flat();
+  const completedLessons = visibleLessons.filter(
+    (l) => progressMap.get(l.id)?.completedAt,
+  ).length;
+  const progressPct =
+    visibleLessons.length > 0
+      ? Math.round((completedLessons / visibleLessons.length) * 100)
+      : 0;
+
   return (
     <>
       <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 lg:flex-row lg:items-end lg:justify-between">
@@ -150,6 +165,24 @@ export default async function CourseDetailPage({ params }: PageProps) {
       {canReadContent && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold">Contenido del curso</h2>
+          {enrolledAsStudent && visibleLessons.length > 0 && (
+            <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-600 dark:text-slate-300">
+                  Tu progreso
+                </span>
+                <span className="text-slate-500">
+                  {completedLessons} de {visibleLessons.length} lecciones · {progressPct}%
+                </span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+          )}
           <div className="mt-4 space-y-3">
             {moduleRows.length === 0 ? (
               <Card>
@@ -190,9 +223,18 @@ export default async function CourseDetailPage({ params }: PageProps) {
                               className="flex items-center justify-between gap-3 text-sm hover:text-brand-600"
                             >
                               <span className="flex items-center gap-2">
-                                <span className="font-mono text-xs text-slate-400">
-                                  {l.position}
-                                </span>
+                                {progressMap.get(l.id)?.completedAt ? (
+                                  <span
+                                    className="font-semibold text-emerald-600"
+                                    title="Completada"
+                                  >
+                                    ✓
+                                  </span>
+                                ) : (
+                                  <span className="font-mono text-xs text-slate-400">
+                                    {l.position}
+                                  </span>
+                                )}
                                 {l.title}
                               </span>
                               <span className="flex items-center gap-2">

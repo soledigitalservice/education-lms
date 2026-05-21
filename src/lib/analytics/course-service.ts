@@ -26,9 +26,11 @@ export interface CourseAnalytics {
     /** REJECTED + REMOVED. */
     droppedOrRejected: number;
     gradeableItems: number;
-    /** 0-100, average over active students of (items done / gradeable items). null if no gradeable items. */
+    /** Published lessons in the course — the denominator for completion. */
+    publishedLessons: number;
+    /** 0-100, average over active students of (lessons completed / published lessons). null if no published lessons. */
     avgCompletionPct: number | null;
-    /** Active students who have done 100% of gradeable items. */
+    /** Active students who have completed every published lesson. */
     fullyComplete: number;
     /** 0-100, mean of all numeric grade percentages in the course. null if nothing graded. */
     avgGradePct: number | null;
@@ -48,6 +50,8 @@ export interface CourseAnalytics {
   };
   /** Published assignments + quizzes, in curriculum order. */
   evaluations: EvaluationStat[];
+  /** Per-lesson completion, in curriculum order — the drop-off view. */
+  lessonProgress: LessonCompletionStat[];
   liveSessions: LiveSessionStat[];
   /** Daily course activity for the last 30 days, zero-filled. */
   activity: ActivityDay[];
@@ -65,6 +69,17 @@ export interface EvaluationStat {
   late: number;
   /** 0-100 average score (% of max). null if nothing graded yet. */
   avgScorePct: number | null;
+}
+
+export interface LessonCompletionStat {
+  id: string;
+  title: string;
+  /** Distinct active students who at least opened the lesson. */
+  viewed: number;
+  /** Distinct active students who marked it complete. */
+  completed: number;
+  /** completed / activeStudents, 0-100. */
+  completionPct: number;
 }
 
 export interface LiveSessionStat {
@@ -113,8 +128,16 @@ export class CourseAnalyticsService {
     const activeIds = new Set(activeEnr.map((e) => e.studentId));
     const N = activeIds.size;
 
-    const [statusCounts, assignments, quizzes, liveSessions, weekly, activity] =
-      await Promise.all([
+    const [
+      statusCounts,
+      assignments,
+      quizzes,
+      lessons,
+      progressRows,
+      liveSessions,
+      weekly,
+      activity,
+    ] = await Promise.all([
         this.prisma.enrollment.groupBy({
           by: ['status'],
           where: { courseId },
@@ -134,6 +157,19 @@ export class CourseAnalyticsService {
             attempts: { include: { grade: true } },
           },
         }),
+        this.prisma.lesson.findMany({
+          where: { publishedAt: { not: null }, module: { courseId } },
+          select: {
+            id: true,
+            title: true,
+            position: true,
+            module: { select: { position: true } },
+          },
+        }),
+        this.prisma.lessonProgress.findMany({
+          where: { lesson: { module: { courseId } } },
+          select: { lessonId: true, studentId: true, completedAt: true },
+        }),
         this.prisma.liveSession.findMany({
           where: { courseId },
           orderBy: { scheduledStart: 'desc' },
@@ -152,11 +188,6 @@ export class CourseAnalyticsService {
 
     // ---- per-evaluation + grade collection ---------------------------------
     const allGradePcts: number[] = [];
-    /** studentId → count of distinct gradeable items they've done. */
-    const doneByStudent = new Map<string, number>();
-    const bump = (sid: string): void => {
-      if (activeIds.has(sid)) doneByStudent.set(sid, (doneByStudent.get(sid) ?? 0) + 1);
-    };
 
     const assignmentStats: Array<EvaluationStat & { sortKey: number }> = assignments.map(
       (a) => {
@@ -168,7 +199,6 @@ export class CourseAnalyticsService {
           if (sub.status === SubmissionStatus.DRAFT) continue;
           if (activeIds.has(sub.studentId) && !seen.has(sub.studentId)) {
             seen.add(sub.studentId);
-            bump(sub.studentId);
           }
           const isLate =
             sub.status === SubmissionStatus.LATE ||
@@ -208,7 +238,6 @@ export class CourseAnalyticsService {
         if (at.submittedAt == null) continue;
         if (activeIds.has(at.studentId) && !seen.has(at.studentId)) {
           seen.add(at.studentId);
-          bump(at.studentId);
         }
         if (at.score != null && at.maxScore != null && at.maxScore > 0) {
           const pct = clampPct((at.score / at.maxScore) * 100);
@@ -234,17 +263,52 @@ export class CourseAnalyticsService {
       .map(({ sortKey: _sortKey, ...rest }) => rest);
 
     const gradeableItems = assignments.length + quizzes.length;
+    const publishedLessons = lessons.length;
 
-    // ---- completion --------------------------------------------------------
+    // ---- lesson progress (views + completion), active students only --------
+    // Per lesson: distinct active students who viewed / completed it.
+    const viewedByLesson = new Map<string, Set<string>>();
+    const completedByLesson = new Map<string, Set<string>>();
+    // Per student: how many distinct lessons they've completed.
+    const completedCountByStudent = new Map<string, number>();
+    for (const p of progressRows) {
+      if (!activeIds.has(p.studentId)) continue;
+      (viewedByLesson.get(p.lessonId) ?? setInto(viewedByLesson, p.lessonId)).add(p.studentId);
+      if (p.completedAt != null) {
+        (completedByLesson.get(p.lessonId) ?? setInto(completedByLesson, p.lessonId)).add(
+          p.studentId,
+        );
+        completedCountByStudent.set(
+          p.studentId,
+          (completedCountByStudent.get(p.studentId) ?? 0) + 1,
+        );
+      }
+    }
+
+    const lessonProgress: LessonCompletionStat[] = lessons
+      .map((l) => {
+        const completed = completedByLesson.get(l.id)?.size ?? 0;
+        return {
+          id: l.id,
+          title: l.title,
+          viewed: viewedByLesson.get(l.id)?.size ?? 0,
+          completed,
+          completionPct: N > 0 ? Math.round((completed / N) * 100) : 0,
+          sortKey: orderKey(l.module.position, l.position),
+        };
+      })
+      .sort((a, b) => a.sortKey - b.sortKey)
+      .map(({ sortKey: _sortKey, ...rest }) => rest);
+
+    // ---- completion (lesson-based) -----------------------------------------
     let avgCompletionPct: number | null = null;
     let fullyComplete = 0;
-    if (gradeableItems > 0 && N > 0) {
+    if (publishedLessons > 0 && N > 0) {
       let sumPct = 0;
       for (const sid of activeIds) {
-        const done = doneByStudent.get(sid) ?? 0;
-        const pct = (done / gradeableItems) * 100;
-        sumPct += pct;
-        if (done >= gradeableItems) fullyComplete++;
+        const done = completedCountByStudent.get(sid) ?? 0;
+        sumPct += (done / publishedLessons) * 100;
+        if (done >= publishedLessons) fullyComplete++;
       }
       avgCompletionPct = round1(sumPct / N);
     }
@@ -265,6 +329,7 @@ export class CourseAnalyticsService {
         droppedOrRejected:
           byStatus[EnrollmentStatus.REJECTED] + byStatus[EnrollmentStatus.REMOVED],
         gradeableItems,
+        publishedLessons,
         avgCompletionPct,
         fullyComplete,
         avgGradePct: allGradePcts.length ? round1(mean(allGradePcts)) : null,
@@ -278,6 +343,7 @@ export class CourseAnalyticsService {
         count: allGradePcts.length,
       },
       evaluations,
+      lessonProgress,
       liveSessions: liveSessions.map((s) => ({
         id: s.id,
         title: s.title,
@@ -381,6 +447,13 @@ export class CourseAnalyticsService {
 // ---------------------------------------------------------------------------
 //  helpers
 // ---------------------------------------------------------------------------
+
+/** Create + register an empty Set for a key, returning it (for inline `?? setInto(...)`). */
+function setInto(map: Map<string, Set<string>>, key: string): Set<string> {
+  const s = new Set<string>();
+  map.set(key, s);
+  return s;
+}
 
 function bucketize(rows: Array<{ day: Date; n: bigint }>): Map<string, number> {
   const m = new Map<string, number>();
