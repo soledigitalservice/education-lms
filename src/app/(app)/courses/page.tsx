@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Roles } from '@/lib/rbac/roles';
 import { listCoursesQuerySchema } from '@/lib/courses/schemas';
+import { getT } from '@/lib/i18n/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,7 @@ interface PageProps {
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const user = await requireSession();
+  const t = getT();
 
   const q = listCoursesQuerySchema.parse({
     q: searchParams.q,
@@ -37,14 +39,14 @@ export default async function CoursesPage({ searchParams }: PageProps) {
     <>
       <header className="flex flex-col items-start justify-between gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-2xl font-bold">Catálogo de cursos</h1>
+          <h1 className="text-2xl font-bold">{t('Catálogo de cursos')}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {page.total} curso(s) publicado(s).
+            {t('{n} curso(s) publicado(s).', { n: page.total })}
           </p>
         </div>
         {(user.role === Roles.TEACHER || user.role === Roles.ADMIN) && (
           <Link href="/courses/new">
-            <Button>+ Nuevo curso</Button>
+            <Button>{t('+ Nuevo curso')}</Button>
           </Link>
         )}
       </header>
@@ -58,7 +60,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           type="search"
           name="q"
           defaultValue={q.q ?? ''}
-          placeholder="Buscar por título o resumen..."
+          placeholder={t('Buscar por título o resumen...')}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-800"
         />
         <select
@@ -66,7 +68,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           defaultValue={q.categoryId ?? ''}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-800"
         >
-          <option value="">Todas las categorías</option>
+          <option value="">{t('Todas las categorías')}</option>
           {cats.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -74,13 +76,13 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           ))}
         </select>
         <Button type="submit" variant="secondary">
-          Filtrar
+          {t('Filtrar')}
         </Button>
       </form>
 
       {page.items.length === 0 ? (
         <p className="mt-10 text-center text-sm text-slate-500">
-          No hay cursos que coincidan con tu búsqueda.
+          {t('No hay cursos que coincidan con tu búsqueda.')}
         </p>
       ) : (
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -101,7 +103,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
                   )}
                   <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
                     <span>Prof. {c.teacher.fullName}</span>
-                    <span>{c.studentCount} alumno(s)</span>
+                    <span>{t('{n} alumno(s)', { n: c.studentCount })}</span>
                   </div>
                 </Card>
               </Link>
@@ -123,6 +125,7 @@ interface PaginationProps {
 }
 
 function Pagination({ total, page, pageSize, q }: PaginationProps) {
+  const t = getT();
   const last = Math.max(1, Math.ceil(total / pageSize));
   if (last === 1) return null;
   const params = new URLSearchParams();
@@ -142,10 +145,10 @@ function Pagination({ total, page, pageSize, q }: PaginationProps) {
           (page === 1 ? 'pointer-events-none opacity-50' : '')
         }
       >
-        ← Anterior
+        {t('← Anterior')}
       </Link>
       <span className="px-2 text-slate-500">
-        Página {page} de {last}
+        {t('Página {p} de {last}', { p: page, last })}
       </span>
       <Link
         href={hrefFor(Math.min(last, page + 1))}
@@ -154,7 +157,7 @@ function Pagination({ total, page, pageSize, q }: PaginationProps) {
           (page === last ? 'pointer-events-none opacity-50' : '')
         }
       >
-        Siguiente →
+        {t('Siguiente →')}
       </Link>
     </nav>
   );

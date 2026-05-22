@@ -18,6 +18,7 @@ import { AddMaterialForm } from '@/components/add-material-form';
 import { TeacherReviewsPanel } from '@/components/teacher-reviews-panel';
 import { LiveSessionsPanel } from '@/components/live-sessions-panel';
 import { Roles } from '@/lib/rbac/roles';
+import { getT, getLocale } from '@/lib/i18n/server';
 import { EnrollmentActions } from './enrollment-actions';
 import { CourseAdminActions } from './course-admin-actions';
 
@@ -29,6 +30,8 @@ interface PageProps {
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const user = await requireSession();
+  const t = getT();
+  const locale = getLocale();
   const ctx = { userId: user.id, role: user.role };
 
   const courses = new CoursesService(prisma);
@@ -113,12 +116,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             {course.category && <Badge variant="brand">{course.category.name}</Badge>}
-            {!course.publishedAt && <Badge variant="warning">Borrador</Badge>}
-            {course.archivedAt && <Badge variant="default">Archivado</Badge>}
+            {!course.publishedAt && <Badge variant="warning">{t('Borrador')}</Badge>}
+            {course.archivedAt && <Badge variant="default">{t('Archivado')}</Badge>}
           </div>
           <h1 className="mt-3 text-3xl font-bold">{course.title}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            Por {course.teacher.fullName} · {course.studentCount} alumno(s) activo(s)
+            {t('Por')} {course.teacher.fullName} ·{' '}
+            {t('{n} alumno(s) activo(s)', { n: course.studentCount })}
             {course.maxStudents ? ` / ${course.maxStudents}` : ''}
           </p>
         </div>
@@ -127,14 +131,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
           {canManage && (
             <>
               <Link href={`/courses/${course.slug}/curriculum`}>
-                <Button variant="secondary">Currículum</Button>
+                <Button variant="secondary">{t('Currículum')}</Button>
               </Link>
               <Link href={`/courses/${course.slug}/analytics`}>
-                <Button variant="secondary">Analítica</Button>
+                <Button variant="secondary">{t('Analítica')}</Button>
               </Link>
               <Link href={`/courses/${course.slug}/students`}>
                 <Button variant="secondary">
-                  Alumnos{' '}
+                  {t('Alumnos')}{' '}
                   {pendingCount > 0 && (
                     <Badge variant="warning" className="ml-2">
                       {pendingCount}
@@ -143,17 +147,17 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 </Button>
               </Link>
               <Link href={`/courses/${course.slug}/forum`}>
-                <Button variant="secondary">Foro</Button>
+                <Button variant="secondary">{t('Foro')}</Button>
               </Link>
               <Link href={`/courses/${course.slug}/edit`}>
-                <Button variant="secondary">Editar</Button>
+                <Button variant="secondary">{t('Editar')}</Button>
               </Link>
               <CourseAdminActions course={course} />
             </>
           )}
           {!canManage && enrolledAsStudent && (
             <Link href={`/courses/${course.slug}/forum`}>
-              <Button variant="secondary">Foro</Button>
+              <Button variant="secondary">{t('Foro')}</Button>
             </Link>
           )}
           {user.role === Roles.STUDENT && course.publishedAt && !course.archivedAt && (
@@ -164,15 +168,16 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
       {canReadContent && (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">Contenido del curso</h2>
+          <h2 className="text-lg font-semibold">{t('Contenido del curso')}</h2>
           {enrolledAsStudent && visibleLessons.length > 0 && (
             <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-medium text-slate-600 dark:text-slate-300">
-                  Tu progreso
+                  {t('Tu progreso')}
                 </span>
                 <span className="text-slate-500">
-                  {completedLessons} de {visibleLessons.length} lecciones · {progressPct}%
+                  {t('{c} de {t} lecciones', { c: completedLessons, t: visibleLessons.length })} ·{' '}
+                  {progressPct}%
                 </span>
               </div>
               <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
@@ -187,13 +192,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
             {moduleRows.length === 0 ? (
               <Card>
                 <p className="text-sm text-slate-500">
-                  El profesor aún no ha publicado módulos.
+                  {t('El profesor aún no ha publicado módulos.')}
                 </p>
               </Card>
             ) : !hasContent && !canManage ? (
               <Card>
                 <p className="text-sm text-slate-500">
-                  El profesor está preparando las lecciones. Vuelve pronto.
+                  {t('El profesor está preparando las lecciones. Vuelve pronto.')}
                 </p>
               </Card>
             ) : (
@@ -204,16 +209,16 @@ export default async function CourseDetailPage({ params }: PageProps) {
                   <Card key={m.id}>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold uppercase text-slate-400">
-                        Módulo {m.position}
+                        {t('Módulo {n}', { n: m.position })}
                       </span>
-                      {!m.publishedAt && <Badge variant="warning">Borrador</Badge>}
+                      {!m.publishedAt && <Badge variant="warning">{t('Borrador')}</Badge>}
                     </div>
                     <h3 className="mt-1 text-base font-semibold">{m.title}</h3>
                     {m.description && (
                       <p className="mt-1 text-sm text-slate-500">{m.description}</p>
                     )}
                     {lessons.length === 0 ? (
-                      <p className="mt-3 text-sm text-slate-500">Sin lecciones todavía.</p>
+                      <p className="mt-3 text-sm text-slate-500">{t('Sin lecciones todavía.')}</p>
                     ) : (
                       <ol className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
                         {lessons.map((l) => (
@@ -226,7 +231,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                                 {progressMap.get(l.id)?.completedAt ? (
                                   <span
                                     className="font-semibold text-emerald-600"
-                                    title="Completada"
+                                    title={t('Completada')}
                                   >
                                     ✓
                                   </span>
@@ -240,11 +245,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
                               <span className="flex items-center gap-2">
                                 <Badge variant="default">{l.type}</Badge>
                                 {!l.publishedAt && canManage && (
-                                  <Badge variant="warning">Borrador</Badge>
+                                  <Badge variant="warning">{t('Borrador')}</Badge>
                                 )}
                                 {l.materialCount > 0 && (
                                   <span className="text-xs text-slate-500">
-                                    {l.materialCount} material(es)
+                                    {t('{n} material(es)', { n: l.materialCount })}
                                   </span>
                                 )}
                               </span>
@@ -264,7 +269,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
       <section className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardTitle>Sobre el curso</CardTitle>
+            <CardTitle>{t('Sobre el curso')}</CardTitle>
             {course.summary && (
               <CardDescription className="mt-2 text-base">{course.summary}</CardDescription>
             )}
@@ -273,13 +278,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 {course.description}
               </div>
             ) : (
-              <p className="mt-6 text-sm text-slate-500">Sin descripción todavía.</p>
+              <p className="mt-6 text-sm text-slate-500">{t('Sin descripción todavía.')}</p>
             )}
           </Card>
 
           {canReadContent && (
             <Card>
-              <CardTitle>Bibliografía y recursos</CardTitle>
+              <CardTitle>{t('Bibliografía y recursos')}</CardTitle>
               <div className="mt-4">
                 <MaterialList items={bibliography} canManage={canManage} />
               </div>
@@ -298,17 +303,21 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
         <aside className="space-y-4">
           <Card>
-            <CardTitle>Detalles</CardTitle>
+            <CardTitle>{t('Detalles')}</CardTitle>
             <dl className="mt-4 space-y-2 text-sm">
-              <Row label="Idioma" value={course.language.toUpperCase()} />
+              <Row label={t('Idioma')} value={course.language.toUpperCase()} />
               <Row
-                label="Inscripción"
-                value={course.requiresApproval ? 'Aprobación del profesor' : 'Inscripción directa'}
+                label={t('Inscripción')}
+                value={
+                  course.requiresApproval
+                    ? t('Aprobación del profesor')
+                    : t('Inscripción directa')
+                }
               />
-              {course.startsAt && <Row label="Empieza" value={fmtDate(course.startsAt)} />}
-              {course.endsAt && <Row label="Termina" value={fmtDate(course.endsAt)} />}
+              {course.startsAt && <Row label={t('Empieza')} value={fmtDate(course.startsAt, locale)} />}
+              {course.endsAt && <Row label={t('Termina')} value={fmtDate(course.endsAt, locale)} />}
               {course.publishedAt && (
-                <Row label="Publicado" value={fmtDate(course.publishedAt)} />
+                <Row label={t('Publicado')} value={fmtDate(course.publishedAt, locale)} />
               )}
             </dl>
           </Card>
@@ -342,8 +351,8 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('es', {
+function fmtDate(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
