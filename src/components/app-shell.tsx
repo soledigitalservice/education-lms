@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChatUnreadBadge } from '@/components/chat-unread-badge';
 import { NotificationBell } from '@/components/notification-bell';
+import { LanguageToggle } from '@/components/language-toggle';
+import { useT } from '@/lib/i18n/client';
 import { apiFetch } from '@/lib/api/client';
 import { cn } from '@/lib/cn';
 import { Roles, ROLE_LABELS, type Role } from '@/lib/rbac/roles';
@@ -40,6 +42,7 @@ interface Props {
 export function AppShell({ user, children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -80,7 +83,7 @@ export function AppShell({ user, children }: Props) {
                       : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800',
                   )}
                 >
-                  {item.label}
+                  {t(item.label)}
                   {item.href === '/messages' && <ChatUnreadBadge />}
                 </Link>
               );
@@ -88,13 +91,14 @@ export function AppShell({ user, children }: Props) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <LanguageToggle className="hidden sm:inline-flex" />
             <NotificationBell />
             <div className="hidden text-right sm:block">
               <p className="text-sm font-medium leading-tight">{user.fullName}</p>
-              <p className="text-xs text-slate-500">{ROLE_LABELS[user.role]}</p>
+              <p className="text-xs text-slate-500">{t(ROLE_LABELS[user.role])}</p>
             </div>
             <Button variant="secondary" size="sm" onClick={logout} loading={loggingOut}>
-              Salir
+              {t('Salir')}
             </Button>
             <button
               type="button"
@@ -136,10 +140,13 @@ export function AppShell({ user, children }: Props) {
                       : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800',
                   )}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               );
             })}
+            <div className="px-3 py-2">
+              <LanguageToggle />
+            </div>
           </nav>
         ) : null}
       </header>

@@ -9,6 +9,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 const schema = z.object({
   email: z.string().email('Correo no válido'),
@@ -17,6 +18,7 @@ const schema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export default function LoginPage() {
     setError(null);
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Datos inválidos');
+      setError(t(parsed.error.errors[0]?.message ?? 'Datos inválidos'));
       return;
     }
     setLoading(true);
@@ -40,7 +42,7 @@ export default function LoginPage() {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado. Intenta de nuevo.');
+        setError(t('Error inesperado. Intenta de nuevo.'));
       }
     } finally {
       setLoading(false);
@@ -49,17 +51,17 @@ export default function LoginPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold tracking-tight">Iniciar sesión</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t('Iniciar sesión')}</h1>
       <p className="mt-2 text-sm text-slate-500">
-        ¿No tienes cuenta?{' '}
+        {t('¿No tienes cuenta?')}{' '}
         <Link href="/register" className="font-medium text-brand-600 hover:underline">
-          Crear una
+          {t('Crear una')}
         </Link>
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
         <Input
-          label="Correo electrónico"
+          label={t('Correo electrónico')}
           type="email"
           name="email"
           autoComplete="email"
@@ -68,7 +70,7 @@ export default function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
         <Input
-          label="Contraseña"
+          label={t('Contraseña')}
           type="password"
           name="password"
           autoComplete="current-password"
@@ -80,7 +82,7 @@ export default function LoginPage() {
         {error ? <Alert variant="error">{error}</Alert> : null}
 
         <Button type="submit" loading={loading} size="lg">
-          Entrar
+          {t('Entrar')}
         </Button>
       </form>
     </>

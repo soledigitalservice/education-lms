@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+import { getLocale } from '@/lib/i18n/server';
+import { getDict } from '@/lib/i18n/dict';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -52,10 +54,14 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
+  const dict = getDict(locale);
   return (
-    <html lang="es" className={inter.variable}>
+    <html lang={locale} className={inter.variable}>
       <body className="font-sans">
-        <Providers>{children}</Providers>
+        <Providers locale={locale} dict={dict}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

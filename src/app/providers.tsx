@@ -3,7 +3,19 @@
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+import { I18nProvider } from '@/lib/i18n/client';
+import type { Dict } from '@/lib/i18n/core';
+import type { Locale } from '@/lib/i18n/config';
+
+export function Providers({
+  children,
+  locale,
+  dict,
+}: {
+  children: React.ReactNode;
+  locale: Locale;
+  dict: Dict;
+}) {
   const [client] = useState(
     () =>
       new QueryClient({
@@ -28,5 +40,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <I18nProvider locale={locale} dict={dict}>
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    </I18nProvider>
+  );
 }

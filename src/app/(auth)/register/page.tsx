@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 const schema = z.object({
   fullName: z.string().min(2, 'Mínimo 2 caracteres'),
@@ -33,6 +34,7 @@ type RegisterResponse =
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useT();
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -49,7 +51,7 @@ export default function RegisterPage() {
     setError(null);
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Datos inválidos');
+      setError(t(parsed.error.errors[0]?.message ?? 'Datos inválidos'));
       return;
     }
     setLoading(true);
@@ -71,7 +73,7 @@ export default function RegisterPage() {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado. Intenta de nuevo.');
+        setError(t('Error inesperado. Intenta de nuevo.'));
       }
     } finally {
       setLoading(false);
@@ -81,13 +83,13 @@ export default function RegisterPage() {
   if (pendingMsg) {
     return (
       <>
-        <h1 className="text-2xl font-bold tracking-tight">Cuenta creada</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t('Cuenta creada')}</h1>
         <Alert variant="warning" className="mt-4">
           {pendingMsg}
         </Alert>
         <div className="mt-6">
           <Link href="/login" className="text-sm font-medium text-brand-600 hover:underline">
-            Volver al login
+            {t('Volver al login')}
           </Link>
         </div>
       </>
@@ -96,24 +98,24 @@ export default function RegisterPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold tracking-tight">Crear cuenta</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t('Crear cuenta')}</h1>
       <p className="mt-2 text-sm text-slate-500">
-        ¿Ya tienes cuenta?{' '}
+        {t('¿Ya tienes cuenta?')}{' '}
         <Link href="/login" className="font-medium text-brand-600 hover:underline">
-          Inicia sesión
+          {t('Inicia sesión')}
         </Link>
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
         <Input
-          label="Nombre completo"
+          label={t('Nombre completo')}
           name="fullName"
           required
           value={form.fullName}
           onChange={(e) => setForm({ ...form, fullName: e.target.value })}
         />
         <Input
-          label="Correo electrónico"
+          label={t('Correo electrónico')}
           type="email"
           name="email"
           autoComplete="email"
@@ -122,31 +124,31 @@ export default function RegisterPage() {
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
         <Input
-          label="Contraseña"
+          label={t('Contraseña')}
           type="password"
           name="password"
           autoComplete="new-password"
           required
-          hint="Mínimo 10 caracteres, con mayúscula, minúscula y dígito."
+          hint={t('Mínimo 10 caracteres, con mayúscula, minúscula y dígito.')}
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
 
         <Select
-          label="Tipo de cuenta"
+          label={t('Tipo de cuenta')}
           name="role"
           value={form.role}
           onChange={(e) =>
             setForm({ ...form, role: e.target.value as 'STUDENT' | 'PARENT' | 'TEACHER' })
           }
         >
-          <option value="STUDENT">Estudiante</option>
-          <option value="PARENT">Padre / Madre</option>
-          <option value="TEACHER">Profesor (requiere aprobación del administrador)</option>
+          <option value="STUDENT">{t('Estudiante')}</option>
+          <option value="PARENT">{t('Padre / Madre')}</option>
+          <option value="TEACHER">{t('Profesor (requiere aprobación del administrador)')}</option>
         </Select>
 
         <Input
-          label="Teléfono (opcional)"
+          label={t('Teléfono (opcional)')}
           name="phone"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -155,7 +157,7 @@ export default function RegisterPage() {
         {error ? <Alert variant="error">{error}</Alert> : null}
 
         <Button type="submit" loading={loading} size="lg">
-          Crear cuenta
+          {t('Crear cuenta')}
         </Button>
       </form>
     </>
