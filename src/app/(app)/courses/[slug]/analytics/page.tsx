@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { CoursesService } from '@/lib/courses/service';
 import { CourseAnalyticsService, type CourseAnalytics } from '@/lib/analytics/course-service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,7 @@ export default async function CourseAnalyticsPage({ params }: PageProps) {
   }
 
   const data = await new CourseAnalyticsService(prisma).getCourseAnalytics(course.id);
+  const t = getT();
 
   return (
     <>
@@ -44,11 +46,11 @@ export default async function CourseAnalyticsPage({ params }: PageProps) {
             href={`/courses/${course.slug}`}
             className="text-xs text-slate-500 hover:underline"
           >
-            ← Volver al curso
+            {t('← Volver al curso')}
           </Link>
-          <h1 className="mt-1 text-2xl font-bold">Analítica · {course.title}</h1>
+          <h1 className="mt-1 text-2xl font-bold">{t('Analítica')} · {course.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Métricas en tiempo real de participación, entregas y rendimiento.
+            {t('Métricas en tiempo real de participación, entregas y rendimiento.')}
           </p>
         </div>
       </header>
@@ -86,32 +88,36 @@ export default async function CourseAnalyticsPage({ params }: PageProps) {
 // ===========================================================================
 
 function KpiGrid({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   const o = data.overview;
   return (
     <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Kpi
-        label="Alumnos activos"
+        label={t('Alumnos activos')}
         value={String(o.activeStudents)}
-        subtitle={`${o.completedStudents} completados · ${o.pendingRequests} pendientes`}
+        subtitle={t('{c} completados · {p} pendientes', {
+          c: o.completedStudents,
+          p: o.pendingRequests,
+        })}
       />
       <Kpi
-        label="Finalización media"
+        label={t('Finalización media')}
         value={o.avgCompletionPct == null ? '—' : `${o.avgCompletionPct}%`}
         subtitle={
           o.publishedLessons === 0
-            ? 'Sin lecciones publicadas'
-            : `${o.fullyComplete} al 100% · ${o.publishedLessons} lecciones`
+            ? t('Sin lecciones publicadas')
+            : t('{f} al 100% · {n} lecciones', { f: o.fullyComplete, n: o.publishedLessons })
         }
       />
       <Kpi
-        label="Nota media"
+        label={t('Nota media')}
         value={o.avgGradePct == null ? '—' : `${o.avgGradePct}%`}
-        subtitle={`${o.gradedCount} calificación(es)`}
+        subtitle={t('{n} calificación(es)', { n: o.gradedCount })}
       />
       <Kpi
-        label="Bajas / rechazos"
+        label={t('Bajas / rechazos')}
         value={String(o.droppedOrRejected)}
-        subtitle="Inscripciones no activas"
+        subtitle={t('Inscripciones no activas')}
         highlight={o.droppedOrRejected > 0}
       />
     </section>
@@ -150,21 +156,24 @@ function Kpi({
 // ===========================================================================
 
 function GradeDistribution({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   const { distribution, avgPct, medianPct, count } = data.grades;
   const max = Math.max(1, ...distribution.map((b) => b.count));
   return (
     <Card>
       <div className="flex items-baseline justify-between">
-        <CardTitle>Distribución de calificaciones</CardTitle>
+        <CardTitle>{t('Distribución de calificaciones')}</CardTitle>
         <span className="text-xs text-slate-500">
-          {count > 0 ? `media ${avgPct}% · mediana ${medianPct}%` : 'sin datos'}
+          {count > 0
+            ? t('media {a}% · mediana {m}%', { a: avgPct ?? 0, m: medianPct ?? 0 })
+            : t('sin datos')}
         </span>
       </div>
       <CardDescription className="mt-1">
-        Porcentaje sobre la nota máxima de cada evaluación (tareas y cuestionarios numéricos).
+        {t('Porcentaje sobre la nota máxima de cada evaluación (tareas y cuestionarios numéricos).')}
       </CardDescription>
       {count === 0 ? (
-        <EmptyHint>Aún no hay calificaciones numéricas en este curso.</EmptyHint>
+        <EmptyHint>{t('Aún no hay calificaciones numéricas en este curso.')}</EmptyHint>
       ) : (
         <div className="mt-6 flex h-44 items-end gap-3">
           {distribution.map((b) => {
@@ -210,20 +219,23 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function EnrollmentFunnel({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   const entries = Object.entries(data.enrollment.byStatus).filter(([, v]) => v > 0);
   const total = entries.reduce((a, [, v]) => a + v, 0);
   return (
     <Card>
-      <CardTitle>Inscripciones por estado</CardTitle>
-      <CardDescription className="mt-1">{total} solicitud(es) en total.</CardDescription>
+      <CardTitle>{t('Inscripciones por estado')}</CardTitle>
+      <CardDescription className="mt-1">
+        {t('{n} solicitud(es) en total.', { n: total })}
+      </CardDescription>
       {total === 0 ? (
-        <EmptyHint>Nadie ha solicitado inscripción todavía.</EmptyHint>
+        <EmptyHint>{t('Nadie ha solicitado inscripción todavía.')}</EmptyHint>
       ) : (
         <ul className="mt-4 space-y-3">
           {entries.map(([status, count]) => (
             <li key={status}>
               <div className="flex items-center justify-between text-sm">
-                <span>{STATUS_LABELS[status] ?? status}</span>
+                <span>{t(STATUS_LABELS[status] ?? status)}</span>
                 <span className="font-semibold">{count}</span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
@@ -245,24 +257,27 @@ function EnrollmentFunnel({ data }: { data: CourseAnalytics }) {
 // ===========================================================================
 
 function EvaluationsTable({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   return (
     <Card>
-      <CardTitle>Rendimiento por evaluación</CardTitle>
+      <CardTitle>{t('Rendimiento por evaluación')}</CardTitle>
       <CardDescription className="mt-1">
-        Tareas y cuestionarios publicados, en orden de currículum. La tasa es sobre {data.activeStudents}{' '}
-        alumno(s) activo(s).
+        {t(
+          'Tareas y cuestionarios publicados, en orden de currículum. La tasa es sobre {n} alumno(s) activo(s).',
+          { n: data.activeStudents },
+        )}
       </CardDescription>
       {data.evaluations.length === 0 ? (
-        <EmptyHint>No hay tareas ni cuestionarios publicados aún.</EmptyHint>
+        <EmptyHint>{t('No hay tareas ni cuestionarios publicados aún.')}</EmptyHint>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-500 dark:border-slate-800">
-                <th className="py-2 pr-3 font-medium">Evaluación</th>
-                <th className="px-2 py-2 font-medium">Entregas</th>
-                <th className="px-2 py-2 font-medium">A tiempo / tarde</th>
-                <th className="px-2 py-2 text-right font-medium">Nota media</th>
+                <th className="py-2 pr-3 font-medium">{t('Evaluación')}</th>
+                <th className="px-2 py-2 font-medium">{t('Entregas')}</th>
+                <th className="px-2 py-2 font-medium">{t('A tiempo / tarde')}</th>
+                <th className="px-2 py-2 text-right font-medium">{t('Nota media')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -271,7 +286,7 @@ function EvaluationsTable({ data }: { data: CourseAnalytics }) {
                   <td className="py-2 pr-3">
                     <div className="flex items-center gap-2">
                       <Badge variant={e.kind === 'QUIZ' ? 'brand' : 'default'}>
-                        {e.kind === 'QUIZ' ? 'Quiz' : 'Tarea'}
+                        {e.kind === 'QUIZ' ? t('Quiz') : t('Tarea')}
                       </Badge>
                       <span className="truncate">{e.title}</span>
                     </div>
@@ -321,15 +336,18 @@ function EvaluationsTable({ data }: { data: CourseAnalytics }) {
 // ===========================================================================
 
 function LessonCompletion({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   return (
     <Card>
-      <CardTitle>Progreso por lección</CardTitle>
+      <CardTitle>{t('Progreso por lección')}</CardTitle>
       <CardDescription className="mt-1">
-        Porcentaje de los {data.activeStudents} alumno(s) activo(s) que han completado cada
-        lección, en orden de currículum. Útil para ver dónde se atascan o abandonan.
+        {t(
+          'Porcentaje de los {n} alumno(s) activo(s) que han completado cada lección, en orden de currículum. Útil para ver dónde se atascan o abandonan.',
+          { n: data.activeStudents },
+        )}
       </CardDescription>
       {data.lessonProgress.length === 0 ? (
-        <EmptyHint>No hay lecciones publicadas todavía.</EmptyHint>
+        <EmptyHint>{t('No hay lecciones publicadas todavía.')}</EmptyHint>
       ) : (
         <ul className="mt-4 space-y-3">
           {data.lessonProgress.map((l, i) => (
@@ -342,7 +360,9 @@ function LessonCompletion({ data }: { data: CourseAnalytics }) {
                 <span className="shrink-0 text-xs text-slate-500">
                   {l.completed}/{data.activeStudents} ({l.completionPct}%)
                   {l.viewed > l.completed && (
-                    <span className="ml-1 text-slate-400">· {l.viewed} vista(s)</span>
+                    <span className="ml-1 text-slate-400">
+                      · {t('{v} vista(s)', { v: l.viewed })}
+                    </span>
                   )}
                 </span>
               </div>
@@ -365,12 +385,15 @@ function LessonCompletion({ data }: { data: CourseAnalytics }) {
 // ===========================================================================
 
 function EnrollmentWeekly({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   const max = Math.max(1, ...data.enrollment.weekly.map((w) => w.count));
   const total = data.enrollment.weekly.reduce((a, w) => a + w.count, 0);
   return (
     <Card>
-      <CardTitle>Solicitudes por semana</CardTitle>
-      <CardDescription className="mt-1">Últimas 12 semanas · {total} en total.</CardDescription>
+      <CardTitle>{t('Solicitudes por semana')}</CardTitle>
+      <CardDescription className="mt-1">
+        {t('Últimas 12 semanas · {n} en total.', { n: total })}
+      </CardDescription>
       <div className="mt-6 flex h-28 items-end gap-1">
         {data.enrollment.weekly.map((w) => (
           <div key={w.week} className="flex flex-1 flex-col-reverse" title={`${w.week}: ${w.count}`}>
@@ -394,14 +417,17 @@ function EnrollmentWeekly({ data }: { data: CourseAnalytics }) {
 // ===========================================================================
 
 function LiveAttendance({ data }: { data: CourseAnalytics }) {
+  const t = getT();
   return (
     <Card>
-      <CardTitle>Asistencia a clases en vivo</CardTitle>
+      <CardTitle>{t('Asistencia a clases en vivo')}</CardTitle>
       <CardDescription className="mt-1">
-        Asistentes únicos por sesión sobre {data.activeStudents} alumno(s) activo(s).
+        {t('Asistentes únicos por sesión sobre {n} alumno(s) activo(s).', {
+          n: data.activeStudents,
+        })}
       </CardDescription>
       {data.liveSessions.length === 0 ? (
-        <EmptyHint>No hay clases en vivo programadas en este curso.</EmptyHint>
+        <EmptyHint>{t('No hay clases en vivo programadas en este curso.')}</EmptyHint>
       ) : (
         <ul className="mt-4 space-y-3">
           {data.liveSessions.map((s) => (
@@ -445,11 +471,12 @@ function ActivityChart({ data }: { data: CourseAnalytics }) {
     (a, d) => a + d.submissions + d.quizAttempts + d.forumPosts,
     0,
   );
+  const t = getT();
   return (
     <Card>
-      <CardTitle>Actividad (últimos 30 días)</CardTitle>
+      <CardTitle>{t('Actividad (últimos 30 días)')}</CardTitle>
       <CardDescription className="mt-1">
-        Entregas + intentos de cuestionario + mensajes del foro · {total} eventos.
+        {t('Entregas + intentos de cuestionario + mensajes del foro · {n} eventos.', { n: total })}
       </CardDescription>
       <div className="mt-6 flex h-28 items-end gap-1">
         {data.activity.map((d) => {

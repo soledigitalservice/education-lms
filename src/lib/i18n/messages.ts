@@ -201,4 +201,74 @@ export const en: Record<string, string> = {
   Empieza: 'Starts',
   Termina: 'Ends',
   Publicado: 'Published',
+
+  // ---- lesson page ----
+  Contenido: 'Content',
+  'Clase en vivo': 'Live class',
+  'Cuando el profesor programe una sesión asociada a esta lección, aparecerá aquí el acceso para entrar a la sala. Mientras tanto, consulta el':
+    'When the teacher schedules a session for this lesson, the access to join the room will appear here. Meanwhile, check the',
+  calendario: 'calendar',
+  'para ver las próximas clases del curso.': 'to see the upcoming course classes.',
+  'Materiales ({n})': 'Materials ({n})',
+  'Añadir material': 'Add material',
+
+  // ---- lesson progress tracker ----
+  '✓ Lección completada': '✓ Lesson completed',
+  'Marcaste esta lección como completada. ¡Buen trabajo!':
+    'You marked this lesson as completed. Well done!',
+  'Marca la lección cuando termines para llevar el control de tu avance.':
+    'Mark the lesson when you finish to keep track of your progress.',
+  Desmarcar: 'Unmark',
+  'Marcar como completada': 'Mark as completed',
+
+  // ---- course analytics ----
+  '← Volver al curso': '← Back to course',
+  'Métricas en tiempo real de participación, entregas y rendimiento.':
+    'Real-time metrics on participation, submissions and performance.',
+  '{c} completados · {p} pendientes': '{c} completed · {p} pending',
+  'Finalización media': 'Average completion',
+  'Sin lecciones publicadas': 'No published lessons',
+  '{f} al 100% · {n} lecciones': '{f} at 100% · {n} lessons',
+  'Nota media': 'Average grade',
+  '{n} calificación(es)': '{n} grade(s)',
+  'Bajas / rechazos': 'Drops / rejections',
+  'Inscripciones no activas': 'Inactive enrollments',
+  'Distribución de calificaciones': 'Grade distribution',
+  'media {a}% · mediana {m}%': 'avg {a}% · median {m}%',
+  'sin datos': 'no data',
+  'Porcentaje sobre la nota máxima de cada evaluación (tareas y cuestionarios numéricos).':
+    "Percentage of each assessment's max score (numeric assignments and quizzes).",
+  'Aún no hay calificaciones numéricas en este curso.':
+    'There are no numeric grades in this course yet.',
+  'Inscripciones por estado': 'Enrollments by status',
+  '{n} solicitud(es) en total.': '{n} request(s) in total.',
+  'Nadie ha solicitado inscripción todavía.': 'No one has requested enrollment yet.',
+  Pendientes: 'Pending',
+  Activos: 'Active',
+  Completados: 'Completed',
+  Rechazados: 'Rejected',
+  'Dados de baja': 'Removed',
+  'Rendimiento por evaluación': 'Performance by assessment',
+  'Tareas y cuestionarios publicados, en orden de currículum. La tasa es sobre {n} alumno(s) activo(s).':
+    'Published assignments and quizzes, in curriculum order. The rate is over {n} active student(s).',
+  'No hay tareas ni cuestionarios publicados aún.': 'No assignments or quizzes published yet.',
+  Evaluación: 'Assessment',
+  Entregas: 'Submissions',
+  'A tiempo / tarde': 'On time / late',
+  Tarea: 'Assignment',
+  'Progreso por lección': 'Progress by lesson',
+  'Porcentaje de los {n} alumno(s) activo(s) que han completado cada lección, en orden de currículum. Útil para ver dónde se atascan o abandonan.':
+    'Percentage of the {n} active student(s) who completed each lesson, in curriculum order. Useful to spot where they get stuck or drop off.',
+  'No hay lecciones publicadas todavía.': 'No published lessons yet.',
+  '{v} vista(s)': '{v} view(s)',
+  'Solicitudes por semana': 'Requests per week',
+  'Últimas 12 semanas · {n} en total.': 'Last 12 weeks · {n} in total.',
+  'Asistencia a clases en vivo': 'Live class attendance',
+  'Asistentes únicos por sesión sobre {n} alumno(s) activo(s).':
+    'Unique attendees per session over {n} active student(s).',
+  'No hay clases en vivo programadas en este curso.':
+    'No live classes scheduled in this course.',
+  'Actividad (últimos 30 días)': 'Activity (last 30 days)',
+  'Entregas + intentos de cuestionario + mensajes del foro · {n} eventos.':
+    'Submissions + quiz attempts + forum posts · {n} events.',
 };

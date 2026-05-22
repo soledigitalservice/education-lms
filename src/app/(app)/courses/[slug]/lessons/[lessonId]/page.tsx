@@ -7,6 +7,7 @@ import { CoursesService } from '@/lib/courses/service';
 import { LessonsService } from '@/lib/lessons/service';
 import { MaterialsService } from '@/lib/materials/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardTitle } from '@/components/ui/card';
@@ -49,6 +50,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   // Student-only progress: is this lesson already marked complete?
   const isStudent = user.role === Roles.STUDENT;
+  const t = getT();
   let initialCompleted = false;
   if (isStudent) {
     const prog = await prisma.lessonProgress.findUnique({
@@ -69,7 +71,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Badge variant="default">{lesson.type}</Badge>
-          {!lesson.publishedAt && canManage && <Badge variant="warning">Borrador</Badge>}
+          {!lesson.publishedAt && canManage && <Badge variant="warning">{t('Borrador')}</Badge>}
           {lesson.durationMin && (
             <span className="text-xs text-slate-500">{lesson.durationMin} min</span>
           )}
@@ -85,7 +87,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
           {canManage ? (
             <Card>
-              <CardTitle>Contenido</CardTitle>
+              <CardTitle>{t('Contenido')}</CardTitle>
               <LessonContentEditor
                 lessonId={lesson.id}
                 initialContent={lesson.content ?? ''}
@@ -93,7 +95,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
             </Card>
           ) : lesson.content ? (
             <Card>
-              <CardTitle>Contenido</CardTitle>
+              <CardTitle>{t('Contenido')}</CardTitle>
               <div className="prose prose-slate mt-4 max-w-none whitespace-pre-wrap text-sm dark:prose-invert">
                 {lesson.content}
               </div>
@@ -116,14 +118,15 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
           {!canManage && lesson.type === 'LIVE_CLASS' && (
             <Card>
-              <CardTitle>Clase en vivo</CardTitle>
+              <CardTitle>{t('Clase en vivo')}</CardTitle>
               <p className="mt-2 text-sm text-slate-500">
-                Cuando el profesor programe una sesión asociada a esta lección, aparecerá aquí el
-                acceso para entrar a la sala. Mientras tanto, consulta el{' '}
+                {t(
+                  'Cuando el profesor programe una sesión asociada a esta lección, aparecerá aquí el acceso para entrar a la sala. Mientras tanto, consulta el',
+                )}{' '}
                 <Link href="/calendar" className="text-brand-600 hover:underline">
-                  calendario
+                  {t('calendario')}
                 </Link>{' '}
-                para ver las próximas clases del curso.
+                {t('para ver las próximas clases del curso.')}
               </p>
             </Card>
           )}
@@ -131,7 +134,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
         <aside className="space-y-4">
           <Card>
-            <CardTitle>Materiales ({materialItems.length})</CardTitle>
+            <CardTitle>{t('Materiales ({n})', { n: materialItems.length })}</CardTitle>
             <div className="mt-4">
               <MaterialList items={materialItems} canManage={canManage} showPreviews />
             </div>
@@ -139,7 +142,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
           {canManage && (
             <Card>
-              <CardTitle>Añadir material</CardTitle>
+              <CardTitle>{t('Añadir material')}</CardTitle>
               <div className="mt-4">
                 <AddMaterialForm target={{ kind: 'lesson', lessonId: lesson.id }} />
               </div>

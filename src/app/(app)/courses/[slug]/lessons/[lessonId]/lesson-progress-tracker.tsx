@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { apiFetch } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { LessonProgressDto } from '@/lib/lesson-progress/service';
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
  * tell who opened the lesson) and offers a complete/undo toggle.
  */
 export function LessonProgressTracker({ lessonId, initialCompleted }: Props) {
+  const t = useT();
   const [completed, setCompleted] = useState(initialCompleted);
   const [busy, setBusy] = useState(false);
   const viewed = useRef(false);
@@ -57,12 +59,12 @@ export function LessonProgressTracker({ lessonId, initialCompleted }: Props) {
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <CardTitle>
-            {completed ? '✓ Lección completada' : 'Tu progreso'}
+            {completed ? t('✓ Lección completada') : t('Tu progreso')}
           </CardTitle>
           <p className="mt-1 text-sm text-slate-500">
             {completed
-              ? 'Marcaste esta lección como completada. ¡Buen trabajo!'
-              : 'Marca la lección cuando termines para llevar el control de tu avance.'}
+              ? t('Marcaste esta lección como completada. ¡Buen trabajo!')
+              : t('Marca la lección cuando termines para llevar el control de tu avance.')}
           </p>
         </div>
         <Button
@@ -71,7 +73,7 @@ export function LessonProgressTracker({ lessonId, initialCompleted }: Props) {
           loading={busy}
           className="shrink-0"
         >
-          {completed ? 'Desmarcar' : 'Marcar como completada'}
+          {completed ? t('Desmarcar') : t('Marcar como completada')}
         </Button>
       </div>
     </Card>
