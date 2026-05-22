@@ -7,15 +7,18 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ROLE_LABELS } from '@/lib/rbac/roles';
+import { getT, getLocale } from '@/lib/i18n/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const user = await requireSession();
+  const t = getT();
+  const locale = getLocale();
 
-  // Friendly date string in Spanish.
+  // Friendly localized date string.
   const now = new Date();
-  const dateLabel = now.toLocaleDateString('es', {
+  const dateLabel = now.toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -26,10 +29,10 @@ export default async function DashboardPage() {
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
         <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
-          {ROLE_LABELS[user.role]}
+          {t(ROLE_LABELS[user.role])}
         </p>
         <h1 className="mt-1 text-3xl font-bold">
-          {greeting(now)}, {user.fullName.split(' ')[0]}
+          {t(greeting(now))}, {user.fullName.split(' ')[0]}
         </h1>
         <p className="mt-1 text-sm capitalize text-slate-500">{dateLabel}</p>
       </header>
@@ -49,6 +52,7 @@ export default async function DashboardPage() {
 // ============================================================================
 
 async function TeacherDashboard({ userId }: { userId: string }) {
+  const t = getT();
   const [
     activeCourses,
     draftCourses,
@@ -104,18 +108,18 @@ async function TeacherDashboard({ userId }: { userId: string }) {
   return (
     <>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Cursos publicados" value={activeCourses} subtitle={`${draftCourses} en borrador`} />
-        <Stat label="Alumnos activos" value={totalStudents} subtitle="en todos tus cursos" />
+        <Stat label={t('Cursos publicados')} value={activeCourses} subtitle={t('{n} en borrador', { n: draftCourses })} />
+        <Stat label={t('Alumnos activos')} value={totalStudents} subtitle={t('en todos tus cursos')} />
         <Stat
-          label="Pendientes de calificar"
+          label={t('Pendientes de calificar')}
           value={pendingGrading.length}
-          subtitle={pendingGrading.length === 0 ? 'al día' : 'requieren tu atención'}
+          subtitle={pendingGrading.length === 0 ? t('al día') : t('requieren tu atención')}
           highlight={pendingGrading.length > 0}
         />
         <Stat
-          label="Solicitudes de inscripción"
+          label={t('Solicitudes de inscripción')}
           value={pendingEnrollments.length}
-          subtitle={pendingEnrollments.length === 0 ? 'sin pendientes' : 'esperando aprobación'}
+          subtitle={pendingEnrollments.length === 0 ? t('sin pendientes') : t('esperando aprobación')}
           highlight={pendingEnrollments.length > 0}
         />
       </section>
@@ -124,18 +128,18 @@ async function TeacherDashboard({ userId }: { userId: string }) {
         <QuickActions
           role="teacher"
           items={[
-            { href: '/courses/new', label: '+ Nuevo curso', primary: true },
-            { href: '/my/courses', label: 'Mis cursos' },
-            { href: '/calendar', label: 'Calendario' },
-            { href: '/messages', label: 'Mensajes' },
+            { href: '/courses/new', label: t('+ Nuevo curso'), primary: true },
+            { href: '/my/courses', label: t('Mis cursos') },
+            { href: '/calendar', label: t('Calendario') },
+            { href: '/messages', label: t('Mensajes') },
           ]}
         />
 
         <Card className="lg:col-span-2">
-          <CardTitle>Próximas clases en vivo</CardTitle>
+          <CardTitle>{t('Próximas clases en vivo')}</CardTitle>
           {upcomingSessions.length === 0 ? (
             <CardDescription className="mt-3">
-              No tienes clases programadas. Crea una desde la página del curso.
+              {t('No tienes clases programadas. Crea una desde la página del curso.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -155,7 +159,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
                     href={`/courses/${s.course.slug}/live/${s.id}`}
                     className="text-sm font-medium text-brand-600 hover:underline"
                   >
-                    {s.status === LiveSessionStatus.LIVE ? 'Entrar ahora →' : 'Ver →'}
+                    {s.status === LiveSessionStatus.LIVE ? t('Entrar ahora →') : t('Ver →')}
                   </Link>
                 </li>
               ))}
@@ -167,7 +171,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
       {pendingEnrollments.length > 0 && (
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>Solicitudes de inscripción pendientes</CardTitle>
+            <CardTitle>{t('Solicitudes de inscripción pendientes')}</CardTitle>
             <Badge variant="warning">{pendingEnrollments.length}</Badge>
           </div>
           <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -176,7 +180,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
                 <div className="min-w-0">
                   <p className="truncate font-medium">{e.student.fullName}</p>
                   <p className="text-xs text-slate-500">
-                    {e.student.email} · solicitó acceso a{' '}
+                    {e.student.email} · {t('solicitó acceso a')}{' '}
                     <span className="font-medium">{e.course.title}</span>
                   </p>
                 </div>
@@ -184,7 +188,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
                   href={`/courses/${e.course.slug}/students`}
                   className="text-sm font-medium text-brand-600 hover:underline"
                 >
-                  Revisar →
+                  {t('Revisar →')}
                 </Link>
               </li>
             ))}
@@ -195,7 +199,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
       {pendingGrading.length > 0 && (
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>Entregas pendientes de calificar</CardTitle>
+            <CardTitle>{t('Entregas pendientes de calificar')}</CardTitle>
             <Badge variant="warning">{pendingGrading.length}</Badge>
           </div>
           <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -204,10 +208,10 @@ async function TeacherDashboard({ userId }: { userId: string }) {
                 <div className="min-w-0">
                   <p className="truncate font-medium">{s.assignment.title}</p>
                   <p className="text-xs text-slate-500">
-                    Entregado por {s.student.fullName}
+                    {t('Entregado por {name}', { name: s.student.fullName })}
                     {s.status === SubmissionStatus.LATE && (
                       <Badge variant="warning" className="ml-2">
-                        Tardía
+                        {t('Tardía')}
                       </Badge>
                     )}
                   </p>
@@ -216,7 +220,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
                   href={`/courses/${s.assignment.course.slug}/submissions/${s.id}`}
                   className="text-sm font-medium text-brand-600 hover:underline"
                 >
-                  Calificar →
+                  {t('Calificar →')}
                 </Link>
               </li>
             ))}
@@ -232,6 +236,7 @@ async function TeacherDashboard({ userId }: { userId: string }) {
 // ============================================================================
 
 async function StudentDashboard({ userId }: { userId: string }) {
+  const t = getT();
   const now = new Date();
   const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -326,33 +331,33 @@ async function StudentDashboard({ userId }: { userId: string }) {
   return (
     <>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Cursos activos" value={activeEnrollments.length} />
+        <Stat label={t('Cursos activos')} value={activeEnrollments.length} />
         <Stat
-          label="Entregas próximas"
+          label={t('Entregas próximas')}
           value={dueSoon.length}
-          subtitle="en los próximos 7 días"
+          subtitle={t('en los próximos 7 días')}
           highlight={dueSoon.length > 0}
         />
-        <Stat label="Notas recibidas" value={recentGrades.length} subtitle="recientes" />
-        <Stat label="Clases en vivo" value={upcomingSessions.length} subtitle="esta semana" />
+        <Stat label={t('Notas recibidas')} value={recentGrades.length} subtitle={t('recientes')} />
+        <Stat label={t('Clases en vivo')} value={upcomingSessions.length} subtitle={t('esta semana')} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
         <QuickActions
           role="student"
           items={[
-            { href: '/courses', label: 'Explorar catálogo', primary: true },
-            { href: '/my/courses', label: 'Mis cursos' },
-            { href: '/my/grades', label: 'Mis notas' },
-            { href: '/calendar', label: 'Calendario' },
+            { href: '/courses', label: t('Explorar catálogo'), primary: true },
+            { href: '/my/courses', label: t('Mis cursos') },
+            { href: '/my/grades', label: t('Mis notas') },
+            { href: '/calendar', label: t('Calendario') },
           ]}
         />
 
         <Card className="lg:col-span-2">
-          <CardTitle>Próximas entregas</CardTitle>
+          <CardTitle>{t('Próximas entregas')}</CardTitle>
           {dueSoon.length === 0 ? (
             <CardDescription className="mt-3">
-              ¡Nada vence en los próximos 7 días! Aprovecha para repasar materiales.
+              {t('¡Nada vence en los próximos 7 días! Aprovecha para repasar materiales.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -366,10 +371,10 @@ async function StudentDashboard({ userId }: { userId: string }) {
                     <div className="min-w-0">
                       <p className="truncate font-medium">{a.title}</p>
                       <p className="text-xs text-slate-500">
-                        {a.course.title} · vence en {hoursLeft}h
+                        {a.course.title} · {t('vence en {h}h', { h: hoursLeft })}
                         {submitted && (
                           <Badge variant="success" className="ml-2">
-                            Entregada
+                            {t('Entregada')}
                           </Badge>
                         )}
                       </p>
@@ -378,7 +383,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
                       href={`/courses/${a.course.slug}${a.lessonId ? `/lessons/${a.lessonId}` : ''}`}
                       className="text-sm font-medium text-brand-600 hover:underline"
                     >
-                      {submitted ? 'Ver →' : 'Entregar →'}
+                      {submitted ? t('Ver →') : t('Entregar →')}
                     </Link>
                   </li>
                 );
@@ -391,17 +396,17 @@ async function StudentDashboard({ userId }: { userId: string }) {
       <section className="grid gap-6 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>Notas recientes</CardTitle>
+            <CardTitle>{t('Notas recientes')}</CardTitle>
             <Link
               href="/my/grades"
               className="text-xs font-medium text-brand-600 hover:underline"
             >
-              Ver todas →
+              {t('Ver todas →')}
             </Link>
           </div>
           {recentGrades.length === 0 ? (
             <CardDescription className="mt-3">
-              Aún no tienes notas. Cuando el profesor califique tu primera entrega aparecerá aquí.
+              {t('Aún no tienes notas. Cuando el profesor califique tu primera entrega aparecerá aquí.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 space-y-2">
@@ -411,7 +416,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
                   className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-800"
                 >
                   <span className="min-w-0 truncate">
-                    {g.submission?.assignment.title ?? 'Cuestionario'}
+                    {g.submission?.assignment.title ?? t('Cuestionario')}
                   </span>
                   <span className="font-medium">
                     {g.numericValue != null && g.submission
@@ -425,10 +430,10 @@ async function StudentDashboard({ userId }: { userId: string }) {
         </Card>
 
         <Card>
-          <CardTitle>Próximas clases en vivo</CardTitle>
+          <CardTitle>{t('Próximas clases en vivo')}</CardTitle>
           {upcomingSessions.length === 0 ? (
             <CardDescription className="mt-3">
-              No hay clases programadas esta semana.
+              {t('No hay clases programadas esta semana.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 space-y-2">
@@ -448,7 +453,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
                         })}
                       </span>
                     </span>
-                    {s.status === LiveSessionStatus.LIVE && <Badge variant="brand">EN VIVO</Badge>}
+                    {s.status === LiveSessionStatus.LIVE && <Badge variant="brand">{t('EN VIVO')}</Badge>}
                   </Link>
                 </li>
               ))}
@@ -459,7 +464,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
 
       {activeEnrollments.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold">Continuar aprendiendo</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t('Continuar aprendiendo')}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {activeEnrollments.slice(0, 6).map((e) => {
               const p = progressByCourse.get(e.course.id) ?? {
@@ -472,7 +477,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
               const href = p.nextLessonId
                 ? `/courses/${e.course.slug}/lessons/${p.nextLessonId}`
                 : `/courses/${e.course.slug}`;
-              const cta = done ? 'Repasar curso' : p.completed > 0 ? 'Continuar' : 'Empezar';
+              const cta = done ? t('Repasar curso') : p.completed > 0 ? t('Continuar') : t('Empezar');
               return (
                 <Card key={e.id} className="flex h-full flex-col">
                   <CardTitle>{e.course.title}</CardTitle>
@@ -480,7 +485,9 @@ async function StudentDashboard({ userId }: { userId: string }) {
                   <div className="mt-3">
                     <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>
-                        {p.total > 0 ? `${p.completed}/${p.total} lecciones` : 'Sin lecciones aún'}
+                        {p.total > 0
+                          ? t('{c}/{t} lecciones', { c: p.completed, t: p.total })
+                          : t('Sin lecciones aún')}
                       </span>
                       <span className="font-medium">{pct}%</span>
                     </div>
@@ -516,6 +523,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
 // ============================================================================
 
 async function ParentDashboard({ userId }: { userId: string }) {
+  const t = getT();
   const [approvedLinks, pendingInvites] = await Promise.all([
     prisma.parentChildLink.findMany({
       where: { parentId: userId, status: 'APPROVED' },
@@ -542,17 +550,17 @@ async function ParentDashboard({ userId }: { userId: string }) {
   return (
     <>
       <section className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Hijos vinculados" value={approvedLinks.length} />
+        <Stat label={t('Hijos vinculados')} value={approvedLinks.length} />
         <Stat
-          label="Invitaciones pendientes"
+          label={t('Invitaciones pendientes')}
           value={pendingInvites}
-          subtitle="esperando aprobación del hijo"
+          subtitle={t('esperando aprobación del hijo')}
           highlight={pendingInvites > 0}
         />
         <Stat
-          label="Cursos seguidos"
+          label={t('Cursos seguidos')}
           value={approvedLinks.reduce((acc, l) => acc + l.child._count.enrollments, 0)}
-          subtitle="entre todos tus hijos"
+          subtitle={t('entre todos tus hijos')}
         />
       </section>
 
@@ -560,22 +568,22 @@ async function ParentDashboard({ userId }: { userId: string }) {
         <QuickActions
           role="parent"
           items={[
-            { href: '/family', label: 'Familia', primary: true },
-            { href: '/courses', label: 'Catálogo' },
-            { href: '/calendar', label: 'Calendario' },
-            { href: '/messages', label: 'Mensajes' },
+            { href: '/family', label: t('Familia'), primary: true },
+            { href: '/courses', label: t('Catálogo') },
+            { href: '/calendar', label: t('Calendario') },
+            { href: '/messages', label: t('Mensajes') },
           ]}
         />
 
         <Card className="lg:col-span-2">
-          <CardTitle>Tus hijos</CardTitle>
+          <CardTitle>{t('Tus hijos')}</CardTitle>
           {approvedLinks.length === 0 ? (
             <CardDescription className="mt-3">
-              Aún no tienes vínculos aprobados. Ve a{' '}
+              {t('Aún no tienes vínculos aprobados. Ve a')}{' '}
               <Link href="/family" className="font-medium text-brand-600 hover:underline">
-                Familia
+                {t('Familia')}
               </Link>{' '}
-              para enviar una invitación a la cuenta de tu hijo.
+              {t('para enviar una invitación a la cuenta de tu hijo.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -584,14 +592,15 @@ async function ParentDashboard({ userId }: { userId: string }) {
                   <div className="min-w-0">
                     <p className="truncate font-medium">{l.child.fullName}</p>
                     <p className="text-xs text-slate-500">
-                      {l.child.email} · {l.child._count.enrollments} curso(s) activo(s)
+                      {l.child.email} ·{' '}
+                      {t('{n} curso(s) activo(s)', { n: l.child._count.enrollments })}
                     </p>
                   </div>
                   <Link
                     href={`/family/${l.child.id}`}
                     className="text-sm font-medium text-brand-600 hover:underline"
                   >
-                    Ver panel →
+                    {t('Ver panel →')}
                   </Link>
                 </li>
               ))}
@@ -608,6 +617,7 @@ async function ParentDashboard({ userId }: { userId: string }) {
 // ============================================================================
 
 async function AdminDashboard() {
+  const t = getT();
   const [
     totalUsers,
     pendingTeachers,
@@ -640,23 +650,23 @@ async function AdminDashboard() {
   return (
     <>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Stat label="Usuarios totales" value={totalUsers} />
+        <Stat label={t('Usuarios totales')} value={totalUsers} />
         <Stat
-          label="Profesores pendientes"
+          label={t('Profesores pendientes')}
           value={pendingTeachers}
-          subtitle="esperando aprobación"
+          subtitle={t('esperando aprobación')}
           highlight={pendingTeachers > 0}
         />
         <Stat
-          label="Cursos publicados"
+          label={t('Cursos publicados')}
           value={activeCourses}
-          subtitle={`${draftCourses} en borrador`}
+          subtitle={t('{n} en borrador', { n: draftCourses })}
         />
-        <Stat label="Inscripciones activas" value={activeEnrollments} />
+        <Stat label={t('Inscripciones activas')} value={activeEnrollments} />
         <Stat
-          label="Entregas (24h)"
+          label={t('Entregas (24h)')}
           value={submissionsToday}
-          subtitle="actividad reciente"
+          subtitle={t('actividad reciente')}
         />
       </section>
 
@@ -664,24 +674,24 @@ async function AdminDashboard() {
         <QuickActions
           role="admin"
           items={[
-            { href: '/admin/users', label: 'Gestionar usuarios', primary: true },
-            { href: '/admin/categories', label: 'Categorías' },
-            { href: '/admin/stats', label: 'Estadísticas' },
-            { href: '/courses', label: 'Catálogo' },
+            { href: '/admin/users', label: t('Gestionar usuarios'), primary: true },
+            { href: '/admin/categories', label: t('Categorías') },
+            { href: '/admin/stats', label: t('Estadísticas') },
+            { href: '/courses', label: t('Catálogo') },
           ]}
         />
 
         <Card>
-          <CardTitle>Salud de la plataforma</CardTitle>
+          <CardTitle>{t('Salud de la plataforma')}</CardTitle>
           <CardDescription className="mt-2">
-            Estadísticas detalladas y métricas de engagement están disponibles en{' '}
+            {t('Estadísticas detalladas y métricas de engagement están disponibles en')}{' '}
             <Link
               href="/admin/stats"
               className="font-medium text-brand-600 hover:underline"
             >
-              el panel completo
+              {t('el panel completo')}
             </Link>
-            : usuarios por rol, cursos por estado, actividad en tiempo real, audit log, etc.
+            {t(': usuarios por rol, cursos por estado, actividad en tiempo real, audit log, etc.')}
           </CardDescription>
         </Card>
       </section>
@@ -689,15 +699,15 @@ async function AdminDashboard() {
       {pendingTeachers > 0 && (
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>Atención requerida</CardTitle>
+            <CardTitle>{t('Atención requerida')}</CardTitle>
             <Badge variant="warning">{pendingTeachers}</Badge>
           </div>
           <p className="mt-2 text-sm text-slate-500">
-            Hay {pendingTeachers} profesor(es) esperando que apruebes su cuenta.
+            {t('Hay {n} profesor(es) esperando que apruebes su cuenta.', { n: pendingTeachers })}
           </p>
           <Link href="/admin/users" className="mt-3 inline-block">
             <Button variant="primary" size="sm">
-              Revisar solicitudes →
+              {t('Revisar solicitudes →')}
             </Button>
           </Link>
         </Card>

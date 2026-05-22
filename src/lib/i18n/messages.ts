@@ -68,4 +68,94 @@ export const en: Record<string, string> = {
   // ---- role labels ----
   Administrador: 'Administrator',
   Profesor: 'Teacher',
+
+  // ---- dashboard: common ----
+  'Buenos días': 'Good morning',
+  'Buenas tardes': 'Good afternoon',
+  'Buenas noches': 'Good evening',
+  Atajos: 'Shortcuts',
+
+  // ---- dashboard: teacher ----
+  'Cursos publicados': 'Published courses',
+  '{n} en borrador': '{n} in draft',
+  'Alumnos activos': 'Active students',
+  'en todos tus cursos': 'across all your courses',
+  'Pendientes de calificar': 'Pending grading',
+  'al día': 'up to date',
+  'requieren tu atención': 'need your attention',
+  'Solicitudes de inscripción': 'Enrollment requests',
+  'sin pendientes': 'none pending',
+  'esperando aprobación': 'awaiting approval',
+  '+ Nuevo curso': '+ New course',
+  'Próximas clases en vivo': 'Upcoming live classes',
+  'No tienes clases programadas. Crea una desde la página del curso.':
+    'You have no scheduled classes. Create one from the course page.',
+  'Entrar ahora →': 'Join now →',
+  'Solicitudes de inscripción pendientes': 'Pending enrollment requests',
+  'solicitó acceso a': 'requested access to',
+  'Revisar →': 'Review →',
+  'Entregas pendientes de calificar': 'Submissions pending grading',
+  'Entregado por {name}': 'Submitted by {name}',
+  Tardía: 'Late',
+  'Calificar →': 'Grade →',
+
+  // ---- dashboard: student ----
+  'Cursos activos': 'Active courses',
+  'Entregas próximas': 'Upcoming due',
+  'en los próximos 7 días': 'in the next 7 days',
+  'Notas recibidas': 'Grades received',
+  recientes: 'recent',
+  'Clases en vivo': 'Live classes',
+  'esta semana': 'this week',
+  'Explorar catálogo': 'Browse catalog',
+  'Próximas entregas': 'Upcoming assignments',
+  '¡Nada vence en los próximos 7 días! Aprovecha para repasar materiales.':
+    'Nothing is due in the next 7 days! Take the chance to review materials.',
+  'vence en {h}h': 'due in {h}h',
+  Entregada: 'Submitted',
+  'Entregar →': 'Submit →',
+  'Notas recientes': 'Recent grades',
+  'Ver todas →': 'View all →',
+  'Aún no tienes notas. Cuando el profesor califique tu primera entrega aparecerá aquí.':
+    'You have no grades yet. When the teacher grades your first submission it will appear here.',
+  Cuestionario: 'Quiz',
+  'No hay clases programadas esta semana.': 'No classes scheduled this week.',
+  'EN VIVO': 'LIVE',
+  'Continuar aprendiendo': 'Continue learning',
+  '{c}/{t} lecciones': '{c}/{t} lessons',
+  'Sin lecciones aún': 'No lessons yet',
+  'Repasar curso': 'Review course',
+  Continuar: 'Continue',
+  Empezar: 'Start',
+
+  // ---- dashboard: parent ----
+  'Hijos vinculados': 'Linked children',
+  'Invitaciones pendientes': 'Pending invitations',
+  'esperando aprobación del hijo': "awaiting the child's approval",
+  'Cursos seguidos': 'Courses followed',
+  'entre todos tus hijos': 'across all your children',
+  'Tus hijos': 'Your children',
+  'Aún no tienes vínculos aprobados. Ve a': 'You have no approved links yet. Go to',
+  'para enviar una invitación a la cuenta de tu hijo.':
+    "to send an invitation to your child's account.",
+  'Ver panel →': 'View panel →',
+  '{n} curso(s) activo(s)': '{n} active course(s)',
+
+  // ---- dashboard: admin ----
+  'Usuarios totales': 'Total users',
+  'Profesores pendientes': 'Pending teachers',
+  'Inscripciones activas': 'Active enrollments',
+  'Entregas (24h)': 'Submissions (24h)',
+  'actividad reciente': 'recent activity',
+  'Gestionar usuarios': 'Manage users',
+  'Salud de la plataforma': 'Platform health',
+  'Estadísticas detalladas y métricas de engagement están disponibles en':
+    'Detailed statistics and engagement metrics are available in',
+  'el panel completo': 'the full dashboard',
+  ': usuarios por rol, cursos por estado, actividad en tiempo real, audit log, etc.':
+    ': users by role, courses by status, real-time activity, audit log, etc.',
+  'Atención requerida': 'Attention required',
+  'Hay {n} profesor(es) esperando que apruebes su cuenta.':
+    'There are {n} teacher(s) waiting for you to approve their account.',
+  'Revisar solicitudes →': 'Review requests →',
 };
