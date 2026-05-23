@@ -7,6 +7,7 @@ import { CoursesService } from '@/lib/courses/service';
 import { ModulesService } from '@/lib/modules/service';
 import { LessonsService } from '@/lib/lessons/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { ApiError } from '@/lib/api/errors';
 import { Card } from '@/components/ui/card';
 import { CurriculumEditor } from './curriculum-editor';
@@ -19,6 +20,7 @@ interface PageProps {
 
 export default async function CurriculumPage({ params }: PageProps) {
   const user = await requireSession();
+  const t = getT();
   const ctx = { userId: user.id, role: user.role };
   const courses = new CoursesService(prisma);
 
@@ -52,11 +54,13 @@ export default async function CurriculumPage({ params }: PageProps) {
             href={`/courses/${course.slug}`}
             className="text-xs text-slate-500 hover:underline"
           >
-            ← Volver al curso
+            {t('← Volver al curso')}
           </Link>
-          <h1 className="mt-1 text-2xl font-bold">Currículum · {course.title}</h1>
+          <h1 className="mt-1 text-2xl font-bold">{t('Currículum')} · {course.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Organiza módulos y lecciones. Los borradores no son visibles para los alumnos hasta que los publiques.
+            {t(
+              'Organiza módulos y lecciones. Los borradores no son visibles para los alumnos hasta que los publiques.',
+            )}
           </p>
         </div>
       </header>
@@ -64,9 +68,9 @@ export default async function CurriculumPage({ params }: PageProps) {
       <div className="mt-8">
         {moduleRows.length === 0 ? (
           <Card>
-            <h2 className="text-lg font-semibold">Empieza por un módulo</h2>
+            <h2 className="text-lg font-semibold">{t('Empieza por un módulo')}</h2>
             <p className="mt-2 text-sm text-slate-500">
-              Los módulos agrupan lecciones. Crea el primero abajo.
+              {t('Los módulos agrupan lecciones. Crea el primero abajo.')}
             </p>
           </Card>
         ) : null}

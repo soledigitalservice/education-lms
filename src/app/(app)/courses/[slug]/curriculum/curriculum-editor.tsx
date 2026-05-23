@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 interface LessonItem {
   id: string;
@@ -37,6 +38,7 @@ interface Props {
 
 export function CurriculumEditor({ courseSlug, modules }: Props) {
   const router = useRouter();
+  const t = useT();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -50,7 +52,7 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado');
+        setError(t('Error inesperado'));
       }
     } finally {
       setBusy(null);
@@ -67,9 +69,9 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-semibold uppercase text-slate-400">
-                  Módulo {m.position}
+                  {t('Módulo {n}', { n: m.position })}
                 </span>
-                {!m.publishedAt && <Badge variant="warning">Borrador</Badge>}
+                {!m.publishedAt && <Badge variant="warning">{t('Borrador')}</Badge>}
               </div>
               <h3 className="mt-1 text-lg font-semibold">{m.title}</h3>
               {m.description && (
@@ -109,18 +111,18 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
                   })
                 }
               >
-                {m.publishedAt ? 'Despublicar' : 'Publicar'}
+                {m.publishedAt ? t('Despublicar') : t('Publicar')}
               </Button>
               <Button
                 size="sm"
                 variant="danger"
                 onClick={() => {
-                  if (confirm(`¿Eliminar el módulo "${m.title}" y todas sus lecciones?`)) {
+                  if (confirm(t('¿Eliminar el módulo "{title}" y todas sus lecciones?', { title: m.title }))) {
                     void call('DELETE', `/api/modules/${m.id}`);
                   }
                 }}
               >
-                Eliminar
+                {t('Eliminar')}
               </Button>
             </div>
           </div>
@@ -128,7 +130,7 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
           <div className="mt-4 space-y-2">
             {m.lessons.length === 0 ? (
               <p className="text-sm text-slate-500">
-                Aún no hay lecciones en este módulo.
+                {t('Aún no hay lecciones en este módulo.')}
               </p>
             ) : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -145,8 +147,8 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
                         </Link>
                         <p className="flex items-center gap-2 text-xs text-slate-500">
                           <Badge variant="default">{l.type}</Badge>
-                          <span>{l.materialCount} material(es)</span>
-                          {!l.publishedAt && <Badge variant="warning">Borrador</Badge>}
+                          <span>{t('{n} material(es)', { n: l.materialCount })}</span>
+                          {!l.publishedAt && <Badge variant="warning">{t('Borrador')}</Badge>}
                         </p>
                       </div>
                     </div>
@@ -180,18 +182,18 @@ export function CurriculumEditor({ courseSlug, modules }: Props) {
                           })
                         }
                       >
-                        {l.publishedAt ? 'Despublicar' : 'Publicar'}
+                        {l.publishedAt ? t('Despublicar') : t('Publicar')}
                       </Button>
                       <Button
                         size="sm"
                         variant="danger"
                         onClick={() => {
-                          if (confirm(`¿Eliminar la lección "${l.title}"?`)) {
+                          if (confirm(t('¿Eliminar la lección "{title}"?', { title: l.title }))) {
                             void call('DELETE', `/api/lessons/${l.id}`);
                           }
                         }}
                       >
-                        Borrar
+                        {t('Borrar')}
                       </Button>
                     </div>
                   </li>
@@ -216,6 +218,7 @@ function NewModuleInline({
   courseSlug: string;
   onCreated: () => void;
 }) {
+  const t = useT();
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -246,8 +249,8 @@ function NewModuleInline({
     <Card className="border-dashed">
       <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <Input
-          label="Nuevo módulo"
-          placeholder="Título del módulo"
+          label={t('Nuevo módulo')}
+          placeholder={t('Título del módulo')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -256,7 +259,7 @@ function NewModuleInline({
           className="flex-1"
         />
         <Button type="submit" loading={busy}>
-          Añadir módulo
+          {t('Añadir módulo')}
         </Button>
       </form>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
@@ -271,6 +274,7 @@ function NewLessonInline({
   moduleId: string;
   onCreated: () => void;
 }) {
+  const t = useT();
   const [title, setTitle] = useState('');
   const [type, setType] = useState<'CONTENT' | 'LIVE_CLASS' | 'ASSIGNMENT' | 'QUIZ'>('CONTENT');
   const [busy, setBusy] = useState(false);
@@ -304,7 +308,7 @@ function NewLessonInline({
       className="mt-3 flex flex-col gap-2 rounded-lg border border-dashed border-slate-300 p-3 dark:border-slate-700 sm:flex-row sm:items-end"
     >
       <Input
-        placeholder="Título de la lección"
+        placeholder={t('Título de la lección')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
@@ -313,13 +317,13 @@ function NewLessonInline({
         className="flex-1"
       />
       <Select value={type} onChange={(e) => setType(e.target.value as typeof type)}>
-        <option value="CONTENT">Contenido</option>
-        <option value="LIVE_CLASS">Clase en vivo</option>
-        <option value="ASSIGNMENT">Tarea</option>
-        <option value="QUIZ">Cuestionario</option>
+        <option value="CONTENT">{t('Contenido')}</option>
+        <option value="LIVE_CLASS">{t('Clase en vivo')}</option>
+        <option value="ASSIGNMENT">{t('Tarea')}</option>
+        <option value="QUIZ">{t('Cuestionario')}</option>
       </Select>
       <Button type="submit" loading={busy} size="sm">
-        + Lección
+        {t('+ Lección')}
       </Button>
       {error && <p className="text-xs text-red-600">{error}</p>}
     </form>

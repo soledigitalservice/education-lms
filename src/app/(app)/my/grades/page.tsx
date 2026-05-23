@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { requireSession } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
 import { GradesService } from '@/lib/grades/service';
+import { getT } from '@/lib/i18n/server';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardTitle } from '@/components/ui/card';
 
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MyGradesPage() {
   const user = await requireSession();
+  const t = getT();
   const grades = await new GradesService(prisma).listForStudent(user.id, {
     userId: user.id,
     role: user.role,
@@ -18,17 +20,17 @@ export default async function MyGradesPage() {
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Mis calificaciones</h1>
+        <h1 className="text-2xl font-bold">{t('Mis calificaciones')}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          {grades.length} calificación(es) recibida(s).
+          {t('{n} calificación(es) recibida(s).', { n: grades.length })}
         </p>
       </header>
 
       {grades.length === 0 ? (
         <Card className="mt-8">
-          <CardTitle>Aún no tienes calificaciones</CardTitle>
+          <CardTitle>{t('Aún no tienes calificaciones')}</CardTitle>
           <p className="mt-2 text-sm text-slate-500">
-            Entrega tareas o completa cuestionarios para empezar a recibir notas.
+            {t('Entrega tareas o completa cuestionarios para empezar a recibir notas.')}
           </p>
         </Card>
       ) : (
@@ -38,14 +40,16 @@ export default async function MyGradesPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-xs text-slate-500">
-                    <Badge variant="default">{g.source.kind === 'submission' ? 'Tarea' : 'Cuestionario'}</Badge>{' '}
+                    <Badge variant="default">
+                      {g.source.kind === 'submission' ? t('Tarea') : t('Cuestionario')}
+                    </Badge>{' '}
                     · {g.courseTitle}
                   </p>
                   <h3 className="mt-1 font-semibold">
                     {g.source.kind === 'submission' ? g.source.assignmentTitle : g.source.quizTitle}
                   </h3>
                   <p className="mt-1 text-xs text-slate-500">
-                    Calificado por {g.graderName} ·{' '}
+                    {t('Calificado por {name}', { name: g.graderName })} ·{' '}
                     {new Date(g.gradedAt).toLocaleDateString('es', {
                       day: '2-digit',
                       month: 'short',

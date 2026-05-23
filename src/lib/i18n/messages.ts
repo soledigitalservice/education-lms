@@ -271,4 +271,48 @@ export const en: Record<string, string> = {
   'Actividad (últimos 30 días)': 'Activity (last 30 days)',
   'Entregas + intentos de cuestionario + mensajes del foro · {n} eventos.':
     'Submissions + quiz attempts + forum posts · {n} events.',
+
+  // ---- my courses ----
+  '{n} curso(s) que estás impartiendo (incluyendo borradores y archivados).':
+    '{n} course(s) you are teaching (including drafts and archived).',
+  'Aún no tienes cursos': "You don't have any courses yet",
+  'Crea tu primer curso para empezar.': 'Create your first course to get started.',
+  'Crear curso': 'Create course',
+  '{n} alumno(s) activos': '{n} active student(s)',
+  '{a} activo(s) · {p} pendiente(s) · {o} histórico': '{a} active · {p} pending · {o} archived',
+  'Aún no estás inscrito en ningún curso': 'You are not enrolled in any course yet',
+  'Explora el catálogo y solicita acceso al curso que te interese.':
+    'Browse the catalog and request access to the course you want.',
+  'Ver catálogo': 'View catalog',
+  'Solicitudes pendientes': 'Pending requests',
+  Histórico: 'History',
+
+  // ---- my grades ----
+  'Mis calificaciones': 'My grades',
+  '{n} calificación(es) recibida(s).': '{n} grade(s) received.',
+  'Aún no tienes calificaciones': "You don't have any grades yet",
+  'Entrega tareas o completa cuestionarios para empezar a recibir notas.':
+    'Submit assignments or complete quizzes to start receiving grades.',
+  'Calificado por {name}': 'Graded by {name}',
+
+  // ---- curriculum ----
+  'Organiza módulos y lecciones. Los borradores no son visibles para los alumnos hasta que los publiques.':
+    'Organize modules and lessons. Drafts are not visible to students until you publish them.',
+  'Empieza por un módulo': 'Start with a module',
+  'Los módulos agrupan lecciones. Crea el primero abajo.':
+    'Modules group lessons. Create the first one below.',
+  Despublicar: 'Unpublish',
+  Publicar: 'Publish',
+  Eliminar: 'Delete',
+  '¿Eliminar el módulo "{title}" y todas sus lecciones?':
+    'Delete the module "{title}" and all its lessons?',
+  'Aún no hay lecciones en este módulo.': 'No lessons in this module yet.',
+  Borrar: 'Delete',
+  '¿Eliminar la lección "{title}"?': 'Delete the lesson "{title}"?',
+  'Nuevo módulo': 'New module',
+  'Título del módulo': 'Module title',
+  'Añadir módulo': 'Add module',
+  'Título de la lección': 'Lesson title',
+  '+ Lección': '+ Lesson',
+  'Error inesperado': 'Unexpected error',
 };

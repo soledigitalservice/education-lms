@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { CoursesService } from '@/lib/courses/service';
 import { EnrollmentsService } from '@/lib/enrollments/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MyCoursesPage() {
   const user = await requireSession();
+  const t = getT();
 
   if (user.role === Roles.TEACHER || user.role === Roles.ADMIN) {
     const taught = await new CoursesService(prisma).listTaughtBy(user.id);
@@ -20,26 +22,28 @@ export default async function MyCoursesPage() {
       <>
         <header className="flex flex-col items-start justify-between gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-end">
           <div>
-            <h1 className="text-2xl font-bold">Mis cursos</h1>
+            <h1 className="text-2xl font-bold">{t('Mis cursos')}</h1>
             <p className="mt-1 text-sm text-slate-500">
-              {taught.length} curso(s) que estás impartiendo (incluyendo borradores y archivados).
+              {t('{n} curso(s) que estás impartiendo (incluyendo borradores y archivados).', {
+                n: taught.length,
+              })}
             </p>
           </div>
           <Link href="/courses/new">
-            <Button>+ Nuevo curso</Button>
+            <Button>{t('+ Nuevo curso')}</Button>
           </Link>
         </header>
         {taught.length === 0 ? (
           <Card className="mt-8">
-            <CardTitle>Aún no tienes cursos</CardTitle>
+            <CardTitle>{t('Aún no tienes cursos')}</CardTitle>
             <CardDescription className="mt-2">
-              Crea tu primer curso para empezar.
+              {t('Crea tu primer curso para empezar.')}
             </CardDescription>
             <Link
               href="/courses/new"
               className="mt-4 inline-flex rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
             >
-              Crear curso
+              {t('Crear curso')}
             </Link>
           </Card>
         ) : (
@@ -49,12 +53,16 @@ export default async function MyCoursesPage() {
                 <Link href={`/courses/${c.slug}`} className="block h-full">
                   <Card className="h-full transition hover:border-brand-400 hover:shadow-md">
                     <div className="flex items-center gap-2">
-                      {!c.publishedAt && <Badge variant="warning">Borrador</Badge>}
-                      {c.archivedAt && <Badge variant="default">Archivado</Badge>}
-                      {c.publishedAt && !c.archivedAt && <Badge variant="success">Publicado</Badge>}
+                      {!c.publishedAt && <Badge variant="warning">{t('Borrador')}</Badge>}
+                      {c.archivedAt && <Badge variant="default">{t('Archivado')}</Badge>}
+                      {c.publishedAt && !c.archivedAt && (
+                        <Badge variant="success">{t('Publicado')}</Badge>
+                      )}
                     </div>
                     <CardTitle className="mt-2">{c.title}</CardTitle>
-                    <p className="mt-3 text-xs text-slate-500">{c.studentCount} alumno(s) activos</p>
+                    <p className="mt-3 text-xs text-slate-500">
+                      {t('{n} alumno(s) activos', { n: c.studentCount })}
+                    </p>
                   </Card>
                 </Link>
               </li>
@@ -74,39 +82,43 @@ export default async function MyCoursesPage() {
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Mis cursos</h1>
+        <h1 className="text-2xl font-bold">{t('Mis cursos')}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          {active.length} activo(s) · {pending.length} pendiente(s) · {other.length} histórico
+          {t('{a} activo(s) · {p} pendiente(s) · {o} histórico', {
+            a: active.length,
+            p: pending.length,
+            o: other.length,
+          })}
         </p>
       </header>
 
       {enrollments.length === 0 ? (
         <Card className="mt-8">
-          <CardTitle>Aún no estás inscrito en ningún curso</CardTitle>
+          <CardTitle>{t('Aún no estás inscrito en ningún curso')}</CardTitle>
           <CardDescription className="mt-2">
-            Explora el catálogo y solicita acceso al curso que te interese.
+            {t('Explora el catálogo y solicita acceso al curso que te interese.')}
           </CardDescription>
           <Link
             href="/courses"
             className="mt-4 inline-flex rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
-            Ver catálogo
+            {t('Ver catálogo')}
           </Link>
         </Card>
       ) : (
         <div className="mt-8 space-y-6">
           {pending.length > 0 && (
-            <Section title="Solicitudes pendientes" badge="warning">
+            <Section title={t('Solicitudes pendientes')} badge="warning">
               <EnrollmentGrid items={pending} />
             </Section>
           )}
           {active.length > 0 && (
-            <Section title="Cursos activos" badge="success">
+            <Section title={t('Cursos activos')} badge="success">
               <EnrollmentGrid items={active} />
             </Section>
           )}
           {other.length > 0 && (
-            <Section title="Histórico" badge="default">
+            <Section title={t('Histórico')} badge="default">
               <EnrollmentGrid items={other} />
             </Section>
           )}
