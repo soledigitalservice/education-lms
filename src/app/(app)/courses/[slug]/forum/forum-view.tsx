@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { ForumThreadDto } from '@/lib/forums/service';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function ForumView({ courseSlug, courseTitle, threads: initial }: Props) {
+  const t = useT();
   const [threads, setThreads] = useState<ForumThreadDto[]>(initial);
   const [showNew, setShowNew] = useState(false);
 
@@ -32,35 +34,39 @@ export function ForumView({ courseSlug, courseTitle, threads: initial }: Props) 
           >
             ← {courseTitle}
           </Link>
-          <h1 className="mt-1 text-2xl font-bold">Foro</h1>
-          <p className="mt-1 text-sm text-slate-500">{threads.length} discusión(es)</p>
+          <h1 className="mt-1 text-2xl font-bold">{t('Foro')}</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('{n} discusión(es)', { n: threads.length })}
+          </p>
         </div>
-        <Button onClick={() => setShowNew(true)}>+ Nuevo tema</Button>
+        <Button onClick={() => setShowNew(true)}>{t('+ Nuevo tema')}</Button>
       </header>
 
       {threads.length === 0 ? (
         <Card className="mt-8">
-          <CardTitle>El foro está vacío</CardTitle>
+          <CardTitle>{t('El foro está vacío')}</CardTitle>
           <p className="mt-2 text-sm text-slate-500">
-            Sé la primera persona en abrir una discusión. Pregunta, comparte recursos o propón un debate.
+            {t(
+              'Sé la primera persona en abrir una discusión. Pregunta, comparte recursos o propón un debate.',
+            )}
           </p>
         </Card>
       ) : (
         <ul className="mt-6 space-y-2">
-          {threads.map((t) => (
-            <li key={t.id}>
-              <Link href={`/courses/${courseSlug}/forum/${t.id}`}>
+          {threads.map((th) => (
+            <li key={th.id}>
+              <Link href={`/courses/${courseSlug}/forum/${th.id}`}>
                 <Card className="transition hover:border-brand-400">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        {t.pinned && <Badge variant="warning">Fijado</Badge>}
-                        {t.locked && <Badge variant="default">Cerrado</Badge>}
-                        <h3 className="truncate font-medium">{t.title}</h3>
+                        {th.pinned && <Badge variant="warning">{t('Fijado')}</Badge>}
+                        {th.locked && <Badge variant="default">{t('Cerrado')}</Badge>}
+                        <h3 className="truncate font-medium">{th.title}</h3>
                       </div>
                       <p className="mt-1 text-xs text-slate-500">
-                        Por {t.author.fullName} ·{' '}
-                        {new Date(t.lastActivityAt).toLocaleString('es', {
+                        {t('Por')} {th.author.fullName} ·{' '}
+                        {new Date(th.lastActivityAt).toLocaleString('es', {
                           dateStyle: 'short',
                           timeStyle: 'short',
                         })}
@@ -68,7 +74,7 @@ export function ForumView({ courseSlug, courseTitle, threads: initial }: Props) 
                     </div>
                     <div className="text-right text-xs text-slate-500">
                       <p className="text-lg font-semibold text-slate-700 dark:text-slate-200">
-                        {t.postCount}
+                        {th.postCount}
                       </p>
                       <p>posts</p>
                     </div>
@@ -107,6 +113,7 @@ function NewThreadDialog({
   onCreated: () => Promise<void>;
 }) {
   const router = useRouter();
+  const t = useT();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
@@ -145,17 +152,17 @@ function NewThreadDialog({
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900"
       >
-        <h2 className="text-lg font-bold">Nuevo tema</h2>
+        <h2 className="text-lg font-bold">{t('Nuevo tema')}</h2>
         <div className="mt-4 flex flex-col gap-3">
           <Input
-            label="Título"
+            label={t('Título')}
             required
             maxLength={200}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Mensaje inicial</label>
+            <label className="text-sm font-medium">{t('Mensaje inicial')}</label>
             <textarea
               className="min-h-32 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
               required
@@ -167,10 +174,10 @@ function NewThreadDialog({
           {error && <Alert variant="error">{error}</Alert>}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancelar
+              {t('Cancelar')}
             </Button>
             <Button type="submit" loading={busy}>
-              Crear tema
+              {t('Crear tema')}
             </Button>
           </div>
         </div>

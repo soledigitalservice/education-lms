@@ -7,8 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { apiFetch } from '@/lib/api/client';
+import { useT, useLocale } from '@/lib/i18n/client';
 import type { CalendarEventDto } from '@/lib/calendar/service';
 import { NewEventDialog } from './new-event-dialog';
+
+/** Maps the active locale to a BCP-47 tag for Intl date formatting. */
+function dateLocale(loc: string): string {
+  return loc === 'en' ? 'en-US' : 'es';
+}
 
 interface Props {
   initialEvents: CalendarEventDto[];
@@ -27,6 +33,7 @@ const KIND_LABELS: Record<CalendarEventDto['kind'], string> = {
 };
 
 export function CalendarView({ initialEvents, initialMonth }: Props) {
+  const t = useT();
   const [events, setEvents] = useState<CalendarEventDto[]>(initialEvents);
   const [view, setView] = useState<ViewMode>('month');
   const [activeMonth, setActiveMonth] = useState<string>(initialMonth);
@@ -62,9 +69,9 @@ export function CalendarView({ initialEvents, initialMonth }: Props) {
     <>
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Calendario</h1>
+          <h1 className="text-2xl font-bold">{t('Calendario')}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {filtered.length} evento(s) visibles
+            {t('{n} evento(s) visibles', { n: filtered.length })}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -79,7 +86,7 @@ export function CalendarView({ initialEvents, initialMonth }: Props) {
                   : 'text-slate-700 dark:text-slate-200')
               }
             >
-              Mes
+              {t('Mes')}
             </button>
             <button
               type="button"
@@ -91,11 +98,11 @@ export function CalendarView({ initialEvents, initialMonth }: Props) {
                   : 'text-slate-700 dark:text-slate-200')
               }
             >
-              Lista
+              {t('Lista')}
             </button>
           </div>
           <Button onClick={() => setShowNew(true)} size="sm">
-            + Evento personal
+            {t('+ Evento personal')}
           </Button>
         </div>
       </header>
@@ -113,7 +120,7 @@ export function CalendarView({ initialEvents, initialMonth }: Props) {
                 : 'border-slate-300 text-slate-500 dark:border-slate-700')
             }
           >
-            {KIND_LABELS[k]}
+            {t(KIND_LABELS[k])}
           </button>
         ))}
       </div>
@@ -162,6 +169,8 @@ function MonthGrid({
   activeMonth: string;
   onMonthChange: (yyyyMm: string) => void;
 }) {
+  const t = useT();
+  const loc = useLocale();
   const [y, m] = activeMonth.split('-').map(Number);
   const year = y ?? new Date().getFullYear();
   const month0 = (m ?? new Date().getMonth() + 1) - 1;
@@ -188,7 +197,7 @@ function MonthGrid({
   for (let i = 0; i < 42; i++) {
     cells.push(new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i));
   }
-  const monthLabel = first.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+  const monthLabel = first.toLocaleDateString(dateLocale(loc), { month: 'long', year: 'numeric' });
 
   function shiftMonth(delta: number): void {
     const d = new Date(year, month0 + delta, 1);
@@ -216,7 +225,7 @@ function MonthGrid({
             key={d}
             className="bg-slate-50 px-2 py-1 text-center font-medium text-slate-500 dark:bg-slate-800"
           >
-            {d}
+            {t(d)}
           </div>
         ))}
         {cells.map((cell) => {
@@ -246,7 +255,9 @@ function MonthGrid({
                 <EventChip key={e.id} event={e} />
               ))}
               {dayEvents.length > 3 && (
-                <p className="text-[10px] text-slate-500">+{dayEvents.length - 3} más</p>
+                <p className="text-[10px] text-slate-500">
+                  {t('+{n} más', { n: dayEvents.length - 3 })}
+                </p>
               )}
             </div>
           );
@@ -257,6 +268,7 @@ function MonthGrid({
 }
 
 function EventChip({ event }: { event: CalendarEventDto }) {
+  const loc = useLocale();
   const color = event.color ?? '#6b7280';
   const content = (
     <div
@@ -266,7 +278,7 @@ function EventChip({ event }: { event: CalendarEventDto }) {
     >
       {!event.allDay && (
         <span className="font-mono opacity-80">
-          {new Date(event.startsAt).toLocaleTimeString('es', {
+          {new Date(event.startsAt).toLocaleTimeString(dateLocale(loc), {
             hour: '2-digit',
             minute: '2-digit',
           })}{' '}
@@ -287,12 +299,14 @@ function EventChip({ event }: { event: CalendarEventDto }) {
 // =========================================================================
 
 function ListView({ events }: { events: CalendarEventDto[] }) {
+  const t = useT();
+  const loc = useLocale();
   // Group by date (locale-formatted) keeping chronological order.
   const groups = useMemo(() => {
     const m = new Map<string, CalendarEventDto[]>();
     for (const e of events) {
       const d = new Date(e.startsAt);
-      const k = d.toLocaleDateString('es', {
+      const k = d.toLocaleDateString(dateLocale(loc), {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -303,12 +317,12 @@ function ListView({ events }: { events: CalendarEventDto[] }) {
       m.set(k, arr);
     }
     return [...m.entries()];
-  }, [events]);
+  }, [events, loc]);
 
   if (groups.length === 0) {
     return (
       <Card>
-        <p className="text-sm text-slate-500">No hay eventos en este rango.</p>
+        <p className="text-sm text-slate-500">{t('No hay eventos en este rango.')}</p>
       </Card>
     );
   }
@@ -333,11 +347,11 @@ function ListView({ events }: { events: CalendarEventDto[] }) {
                     )}
                   </div>
                   <div className="text-right text-xs text-slate-500">
-                    <Badge>{KIND_LABELS[e.kind]}</Badge>
+                    <Badge>{t(KIND_LABELS[e.kind])}</Badge>
                     <p className="mt-1">
                       {e.allDay
-                        ? 'Todo el día'
-                        : new Date(e.startsAt).toLocaleTimeString('es', {
+                        ? t('Todo el día')
+                        : new Date(e.startsAt).toLocaleTimeString(dateLocale(loc), {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}

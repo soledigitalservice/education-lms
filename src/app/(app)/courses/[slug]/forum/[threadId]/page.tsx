@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { ForumsService } from '@/lib/forums/service';
 import { ApiError } from '@/lib/api/errors';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { ThreadView } from './thread-view';
 
 export const dynamic = 'force-dynamic';
@@ -42,7 +43,7 @@ export default async function ForumThreadPage({ params }: PageProps) {
           href={`/courses/${params.slug}/forum`}
           className="text-xs text-slate-500 hover:underline"
         >
-          ← Foro
+          ← {getT()('Foro')}
         </Link>
       </header>
       <ThreadView

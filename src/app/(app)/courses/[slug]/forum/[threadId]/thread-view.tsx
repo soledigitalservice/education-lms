@@ -8,7 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { ForumPostDto, ForumThreadDto } from '@/lib/forums/service';
+
+const DELETED = '[mensaje eliminado]';
 
 interface Props {
   thread: ForumThreadDto;
@@ -19,6 +22,7 @@ interface Props {
 
 export function ThreadView({ thread: initialThread, posts: initialPosts, currentUserId, canModerate }: Props) {
   const router = useRouter();
+  const t = useT();
   const [thread, setThread] = useState<ForumThreadDto>(initialThread);
   const [posts, setPosts] = useState<ForumPostDto[]>(initialPosts);
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -44,14 +48,14 @@ export function ThreadView({ thread: initialThread, posts: initialPosts, current
   }
 
   async function deletePost(postId: string): Promise<void> {
-    if (!confirm('¿Eliminar este mensaje?')) return;
+    if (!confirm(t('¿Eliminar este mensaje?'))) return;
     setBusy(postId);
     try {
       await apiFetch(`/api/posts/${postId}`, { method: 'DELETE' });
       setPosts(
         posts.map((p) =>
           p.id === postId
-            ? { ...p, body: '[mensaje eliminado]' }
+            ? { ...p, body: DELETED }
             : p,
         ),
       );
@@ -87,12 +91,12 @@ export function ThreadView({ thread: initialThread, posts: initialPosts, current
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            {thread.pinned && <Badge variant="warning">Fijado</Badge>}
-            {thread.locked && <Badge variant="default">Cerrado</Badge>}
+            {thread.pinned && <Badge variant="warning">{t('Fijado')}</Badge>}
+            {thread.locked && <Badge variant="default">{t('Cerrado')}</Badge>}
           </div>
           <h1 className="mt-1 text-2xl font-bold">{thread.title}</h1>
           <p className="mt-1 text-xs text-slate-500">
-            Por {thread.author.fullName} ·{' '}
+            {t('Por')} {thread.author.fullName} ·{' '}
             {new Date(thread.createdAt).toLocaleDateString('es')}
           </p>
         </div>
@@ -104,7 +108,7 @@ export function ThreadView({ thread: initialThread, posts: initialPosts, current
               onClick={() => toggleModeration('pinned')}
               loading={busy === 'pinned'}
             >
-              {thread.pinned ? 'Desfijar' : 'Fijar'}
+              {thread.pinned ? t('Desfijar') : t('Fijar')}
             </Button>
             <Button
               size="sm"
@@ -112,7 +116,7 @@ export function ThreadView({ thread: initialThread, posts: initialPosts, current
               onClick={() => toggleModeration('locked')}
               loading={busy === 'locked'}
             >
-              {thread.locked ? 'Reabrir' : 'Cerrar'}
+              {thread.locked ? t('Reabrir') : t('Cerrar')}
             </Button>
           </div>
         )}
@@ -162,7 +166,7 @@ export function ThreadView({ thread: initialThread, posts: initialPosts, current
 
       {!thread.locked && (
         <Card className="mt-6">
-          <CardTitle>Añadir respuesta</CardTitle>
+          <CardTitle>{t('Añadir respuesta')}</CardTitle>
           <ReplyForm
             embedded
             onCancel={() => undefined}
@@ -192,8 +196,9 @@ function PostCard({
   onReplyClick: () => void;
   showReplyButton: boolean;
 }) {
+  const t = useT();
   const isAuthor = post.author.id === currentUserId;
-  const deleted = post.body === '[mensaje eliminado]';
+  const deleted = post.body === DELETED;
   return (
     <Card>
       <div className="flex items-start justify-between gap-3">
@@ -204,18 +209,18 @@ function PostCard({
               dateStyle: 'short',
               timeStyle: 'short',
             })}
-            {post.editedAt && ' · editado'}
+            {post.editedAt && ` · ${t('editado')}`}
           </p>
         </div>
         <div className="flex gap-2">
           {showReplyButton && (
             <Button size="sm" variant="ghost" onClick={onReplyClick}>
-              Responder
+              {t('Responder')}
             </Button>
           )}
           {(isAuthor || canModerate) && !deleted && (
             <Button size="sm" variant="ghost" loading={busy} onClick={onDelete}>
-              Eliminar
+              {t('Eliminar')}
             </Button>
           )}
         </div>
@@ -225,7 +230,7 @@ function PostCard({
           'mt-3 whitespace-pre-wrap text-sm ' + (deleted ? 'italic text-slate-400' : '')
         }
       >
-        {post.body}
+        {deleted ? t('[mensaje eliminado]') : post.body}
       </p>
     </Card>
   );
@@ -242,6 +247,7 @@ function ReplyForm({
   busy: boolean;
   embedded?: boolean;
 }) {
+  const t = useT();
   const [body, setBody] = useState('');
   async function submit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -257,16 +263,16 @@ function ReplyForm({
         maxLength={20_000}
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        placeholder="Escribe tu respuesta..."
+        placeholder={t('Escribe tu respuesta...')}
       />
       <div className="mt-2 flex justify-end gap-2">
         {!embedded && (
           <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
-            Cancelar
+            {t('Cancelar')}
           </Button>
         )}
         <Button type="submit" size="sm" loading={busy} disabled={!body.trim()}>
-          Publicar
+          {t('Publicar')}
         </Button>
       </div>
     </form>

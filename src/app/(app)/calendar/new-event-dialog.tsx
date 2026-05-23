@@ -6,6 +6,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 interface Props {
   onClose: () => void;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function NewEventDialog({ onClose, onCreated }: Props) {
+  const t = useT();
   const [form, setForm] = useState({
     title: '',
     notes: '',
@@ -60,20 +62,20 @@ export function NewEventDialog({ onClose, onCreated }: Props) {
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900"
       >
-        <h2 className="text-lg font-bold">Nuevo evento personal</h2>
+        <h2 className="text-lg font-bold">{t('Nuevo evento personal')}</h2>
         <p className="mt-1 text-xs text-slate-500">
-          Solo lo ves tú. Útil para recordatorios, deadlines internos, reuniones, etc.
+          {t('Solo lo ves tú. Útil para recordatorios, deadlines internos, reuniones, etc.')}
         </p>
 
         <div className="mt-4 flex flex-col gap-3">
           <Input
-            label="Título"
+            label={t('Título')}
             required
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Notas</label>
+            <label className="text-sm font-medium">{t('Notas')}</label>
             <textarea
               className="min-h-20 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
               maxLength={2_000}
@@ -83,14 +85,14 @@ export function NewEventDialog({ onClose, onCreated }: Props) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <Input
-              label="Inicio"
+              label={t('Fecha de inicio')}
               type="datetime-local"
               required
               value={form.startsAt}
               onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
             />
             <Input
-              label="Fin"
+              label={t('Fecha de fin')}
               type="datetime-local"
               required
               value={form.endsAt}
@@ -105,10 +107,10 @@ export function NewEventDialog({ onClose, onCreated }: Props) {
                 onChange={(e) => setForm({ ...form, allDay: e.target.checked })}
                 className="size-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
               />
-              Todo el día
+              {t('Todo el día')}
             </label>
             <label className="flex items-center gap-2 text-sm">
-              Color
+              {t('Color')}
               <input
                 type="color"
                 value={form.color}
@@ -122,10 +124,10 @@ export function NewEventDialog({ onClose, onCreated }: Props) {
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancelar
+              {t('Cancelar')}
             </Button>
             <Button type="submit" loading={busy}>
-              Crear
+              {t('Crear')}
             </Button>
           </div>
         </div>
