@@ -366,4 +366,70 @@ export const en: Record<string, string> = {
   'Fecha de inicio': 'Start date',
   'Fecha de fin': 'End date',
   Crear: 'Create',
+
+  // ---- family ----
+  'Vincula tu cuenta con la de tus hijos/as para ver sus cursos y notas.':
+    'Link your account to your children to see their courses and grades.',
+  'Aprueba o rechaza solicitudes de tus padres/tutores.':
+    'Approve or reject requests from your parents/guardians.',
+  'Vista no disponible': 'View not available',
+  'Esta sección es para padres y estudiantes.': 'This section is for parents and students.',
+  'Solicitud enviada. Tu hijo/a la verá en su sección "Familia" y podrá aprobarla.':
+    'Request sent. Your child will see it in their "Family" section and can approve it.',
+  '¿Revocar este vínculo? Perderás el acceso a las notas y cursos del estudiante.':
+    "Revoke this link? You will lose access to the student's grades and courses.",
+  'Hijos vinculados ({n})': 'Linked children ({n})',
+  'Aún no tienes vínculos aprobados. Solicita uno usando el formulario a la derecha.':
+    'You have no approved links yet. Request one using the form on the right.',
+  Revocar: 'Revoke',
+  'Solicitudes pendientes ({n})': 'Pending requests ({n})',
+  'Esperando aprobación': 'Awaiting approval',
+  'Solicitar nuevo vínculo': 'Request a new link',
+  'Tu hijo/a debe tener ya una cuenta de estudiante en la plataforma. Verá tu solicitud al iniciar sesión y deberá aprobarla.':
+    'Your child must already have a student account on the platform. They will see your request when they sign in and must approve it.',
+  'Email del estudiante': 'Student email',
+  'Nota para tu hijo/a (opcional)': 'Note for your child (optional)',
+  'Enviar solicitud': 'Send request',
+  'No tienes solicitudes pendientes. Cuando tu padre/madre/tutor pida vincularse a tu cuenta, aparecerá aquí.':
+    'You have no pending requests. When a parent/guardian asks to link to your account, it will appear here.',
+  Aprobar: 'Approve',
+  Rechazar: 'Reject',
+  'Vínculos aprobados ({n})': 'Approved links ({n})',
+  'Las personas siguientes pueden ver tus cursos, notas y materiales.':
+    'The following people can see your courses, grades and materials.',
+  APROBADO: 'APPROVED',
+  'Cursos activos ({n})': 'Active courses ({n})',
+  'Sin cursos activos.': 'No active courses.',
+  'Media:': 'Average:',
+  '{n} solicitud(es) de inscripción pendiente(s).': '{n} pending enrollment request(s).',
+  'Calificaciones recientes ({n})': 'Recent grades ({n})',
+  '{name} aún no tiene calificaciones.': '{name} has no grades yet.',
+
+  // ---- notification preferences ----
+  'Preferencias de notificación': 'Notification preferences',
+  'Elige cómo recibes cada tipo de aviso. Las notificaciones in-app no se pueden desactivar — la campana es tu registro permanente.':
+    'Choose how you receive each type of notice. In-app notifications cannot be disabled — the bell is your permanent record.',
+  'Atajos por canal': 'Shortcuts by channel',
+  'Activa o desactiva todos los tipos para un canal de golpe. Luego puedes ajustar excepciones en la tabla de abajo.':
+    'Enable or disable all types for a channel at once. You can then adjust exceptions in the table below.',
+  'activar todo': 'enable all',
+  'desactivar todo': 'disable all',
+  'Tipo de aviso': 'Notification type',
+  'Cuenta de profesor aprobada': 'Teacher account approved',
+  'Solicitud rechazada': 'Request rejected',
+  'Inscripción aprobada': 'Enrollment approved',
+  'Inscripción rechazada': 'Enrollment rejected',
+  'Nueva solicitud de inscripción': 'New enrollment request',
+  'Baja de curso': 'Course removal',
+  'Nueva tarea publicada': 'New assignment published',
+  'Tarea calificada': 'Assignment graded',
+  'Recordatorio: tarea por vencer': 'Reminder: assignment due soon',
+  'Clase en vivo empezando': 'Live class starting',
+  'Mensajes de chat': 'Chat messages',
+  'Solicitud de vínculo padre': 'Parent link request',
+  'Vínculo padre aprobado': 'Parent link approved',
+  'Respuesta en foro': 'Forum reply',
+  'In-app no puede desactivarse': 'In-app cannot be disabled',
+  Guardado: 'Saved',
+  'Guardar cambios': 'Save changes',
 };

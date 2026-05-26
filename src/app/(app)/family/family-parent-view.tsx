@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { ParentLinkDto } from '@/lib/parent-links/service';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 
 export function FamilyParentView({ initialLinks, currentUserId }: Props) {
   const router = useRouter();
+  const t = useT();
   const [email, setEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
@@ -42,7 +44,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
         method: 'POST',
         body: { childEmail: email.trim(), notes: notes.trim() || undefined },
       });
-      setSuccess('Solicitud enviada. Tu hijo/a la verá en su sección "Familia" y podrá aprobarla.');
+      setSuccess(t('Solicitud enviada. Tu hijo/a la verá en su sección "Familia" y podrá aprobarla.'));
       setEmail('');
       setNotes('');
       router.refresh();
@@ -50,7 +52,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado');
+        setError(t('Error inesperado'));
       }
     } finally {
       setBusy(false);
@@ -58,7 +60,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
   }
 
   async function revoke(id: string): Promise<void> {
-    if (!confirm('¿Revocar este vínculo? Perderás el acceso a las notas y cursos del estudiante.')) {
+    if (!confirm(t('¿Revocar este vínculo? Perderás el acceso a las notas y cursos del estudiante.'))) {
       return;
     }
     await apiFetch(`/api/parent-links/${id}`, { method: 'DELETE' });
@@ -69,10 +71,10 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
     <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
       <div className="space-y-6">
         <Card>
-          <CardTitle>Hijos vinculados ({approved.length})</CardTitle>
+          <CardTitle>{t('Hijos vinculados ({n})', { n: approved.length })}</CardTitle>
           {approved.length === 0 ? (
             <CardDescription className="mt-3">
-              Aún no tienes vínculos aprobados. Solicita uno usando el formulario a la derecha.
+              {t('Aún no tienes vínculos aprobados. Solicita uno usando el formulario a la derecha.')}
             </CardDescription>
           ) : (
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -87,10 +89,10 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
                       href={`/family/${l.child.id}`}
                       className="text-sm font-medium text-brand-600 hover:underline"
                     >
-                      Ver →
+                      {t('Ver →')}
                     </Link>
                     <Button size="sm" variant="ghost" onClick={() => revoke(l.id)}>
-                      Revocar
+                      {t('Revocar')}
                     </Button>
                   </div>
                 </li>
@@ -101,7 +103,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
 
         {pending.length > 0 && (
           <Card>
-            <CardTitle>Solicitudes pendientes ({pending.length})</CardTitle>
+            <CardTitle>{t('Solicitudes pendientes ({n})', { n: pending.length })}</CardTitle>
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
               {pending.map((l) => (
                 <li key={l.id} className="flex items-center justify-between py-3">
@@ -112,9 +114,9 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="warning">Esperando aprobación</Badge>
+                    <Badge variant="warning">{t('Esperando aprobación')}</Badge>
                     <Button size="sm" variant="ghost" onClick={() => revoke(l.id)}>
-                      Cancelar
+                      {t('Cancelar')}
                     </Button>
                   </div>
                 </li>
@@ -125,7 +127,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
 
         {other.length > 0 && (
           <Card>
-            <CardTitle>Histórico</CardTitle>
+            <CardTitle>{t('Histórico')}</CardTitle>
             <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
               {other.map((l) => (
                 <li key={l.id} className="flex items-center justify-between py-2 text-sm">
@@ -141,20 +143,20 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
       </div>
 
       <Card>
-        <CardTitle>Solicitar nuevo vínculo</CardTitle>
+        <CardTitle>{t('Solicitar nuevo vínculo')}</CardTitle>
         <CardDescription className="mt-2">
-          Tu hijo/a debe tener ya una cuenta de estudiante en la plataforma. Verá tu solicitud al iniciar sesión y deberá aprobarla.
+          {t('Tu hijo/a debe tener ya una cuenta de estudiante en la plataforma. Verá tu solicitud al iniciar sesión y deberá aprobarla.')}
         </CardDescription>
         <form onSubmit={submit} className="mt-4 flex flex-col gap-3">
           <Input
-            label="Email del estudiante"
+            label={t('Email del estudiante')}
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Nota para tu hijo/a (opcional)</label>
+            <label className="text-sm font-medium">{t('Nota para tu hijo/a (opcional)')}</label>
             <textarea
               className="min-h-20 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
               maxLength={500}
@@ -165,7 +167,7 @@ export function FamilyParentView({ initialLinks, currentUserId }: Props) {
           {error && <Alert variant="error">{error}</Alert>}
           {success && <Alert variant="success">{success}</Alert>}
           <Button type="submit" loading={busy} className="self-start">
-            Enviar solicitud
+            {t('Enviar solicitud')}
           </Button>
         </form>
       </Card>

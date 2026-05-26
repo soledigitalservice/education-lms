@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { PreferenceMatrixCell } from '@/lib/notification-preferences/service';
 
 const KIND_LABELS: Record<NotificationKind, string> = {
@@ -37,6 +38,7 @@ const ALL_KINDS = Object.values(NotificationKind);
 const ALL_CHANNELS = Object.values(NotificationChannel);
 
 export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }) {
+  const t = useT();
   // Local state: convert array to a lookup for fast toggling.
   const initialMap = useMemo(() => {
     const m = new Map<string, PreferenceMatrixCell>();
@@ -105,28 +107,26 @@ export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Preferencias de notificación</h1>
+        <h1 className="text-2xl font-bold">{t('Preferencias de notificación')}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Elige cómo recibes cada tipo de aviso. Las notificaciones in-app no se pueden
-          desactivar — la campana es tu registro permanente.
+          {t('Elige cómo recibes cada tipo de aviso. Las notificaciones in-app no se pueden desactivar — la campana es tu registro permanente.')}
         </p>
       </header>
 
       <Card className="mt-6">
-        <CardTitle>Atajos por canal</CardTitle>
+        <CardTitle>{t('Atajos por canal')}</CardTitle>
         <CardDescription className="mt-1">
-          Activa o desactiva todos los tipos para un canal de golpe. Luego puedes ajustar
-          excepciones en la tabla de abajo.
+          {t('Activa o desactiva todos los tipos para un canal de golpe. Luego puedes ajustar excepciones en la tabla de abajo.')}
         </CardDescription>
         <div className="mt-4 flex flex-wrap gap-2">
           {ALL_CHANNELS.filter((c) => c !== NotificationChannel.INAPP).map((channel) => (
             <div key={channel} className="flex items-center gap-1">
               <span className="text-xs text-slate-500">{CHANNEL_LABELS[channel]}:</span>
               <Button size="sm" variant="ghost" onClick={() => resetChannel(channel, true)}>
-                activar todo
+                {t('activar todo')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => resetChannel(channel, false)}>
-                desactivar todo
+                {t('desactivar todo')}
               </Button>
             </div>
           ))}
@@ -137,10 +137,10 @@ export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800">
-              <th className="py-2 pr-3 text-left font-medium">Tipo de aviso</th>
+              <th className="py-2 pr-3 text-left font-medium">{t('Tipo de aviso')}</th>
               {ALL_CHANNELS.map((c) => (
                 <th key={c} className="px-2 py-2 text-center font-medium">
-                  {CHANNEL_LABELS[c]}
+                  {t(CHANNEL_LABELS[c])}
                 </th>
               ))}
             </tr>
@@ -151,7 +151,7 @@ export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }
                 key={kind}
                 className="border-b border-slate-100 last:border-0 dark:border-slate-800/50"
               >
-                <td className="py-2 pr-3">{KIND_LABELS[kind] ?? kind}</td>
+                <td className="py-2 pr-3">{t(KIND_LABELS[kind] ?? kind)}</td>
                 {ALL_CHANNELS.map((channel) => {
                   const cell = cells.get(`${kind}:${channel}`);
                   if (!cell) return <td key={channel} />;
@@ -162,7 +162,7 @@ export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }
                           'inline-flex cursor-pointer items-center justify-center ' +
                           (cell.locked ? 'cursor-not-allowed opacity-50' : '')
                         }
-                        title={cell.locked ? 'In-app no puede desactivarse' : undefined}
+                        title={cell.locked ? t('In-app no puede desactivarse') : undefined}
                       >
                         <input
                           type="checkbox"
@@ -184,9 +184,9 @@ export function PreferencesView({ initial }: { initial: PreferenceMatrixCell[] }
       {error && <Alert variant="error" className="mt-4">{error}</Alert>}
 
       <div className="mt-6 flex items-center justify-end gap-3">
-        {saved && <Badge variant="success">Guardado</Badge>}
+        {saved && <Badge variant="success">{t('Guardado')}</Badge>}
         <Button onClick={save} loading={busy} disabled={!dirty}>
-          Guardar cambios
+          {t('Guardar cambios')}
         </Button>
       </div>
     </>

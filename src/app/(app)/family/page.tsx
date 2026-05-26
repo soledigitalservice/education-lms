@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
 import { ParentLinksService } from '@/lib/parent-links/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { FamilyParentView } from './family-parent-view';
 import { FamilyStudentInbox } from './family-student-inbox';
@@ -21,15 +22,16 @@ export default async function FamilyPage() {
     userId: user.id,
     role: user.role,
   });
+  const t = getT();
 
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Familia</h1>
+        <h1 className="text-2xl font-bold">{t('Familia')}</h1>
         <p className="mt-1 text-sm text-slate-500">
           {user.role === Roles.PARENT
-            ? 'Vincula tu cuenta con la de tus hijos/as para ver sus cursos y notas.'
-            : 'Aprueba o rechaza solicitudes de tus padres/tutores.'}
+            ? t('Vincula tu cuenta con la de tus hijos/as para ver sus cursos y notas.')
+            : t('Aprueba o rechaza solicitudes de tus padres/tutores.')}
         </p>
       </header>
 
@@ -39,9 +41,9 @@ export default async function FamilyPage() {
         <FamilyStudentInbox initialLinks={links} currentUserId={user.id} />
       ) : (
         <Card className="mt-8">
-          <CardTitle>Vista no disponible</CardTitle>
+          <CardTitle>{t('Vista no disponible')}</CardTitle>
           <CardDescription>
-            Esta sección es para padres y estudiantes.
+            {t('Esta sección es para padres y estudiantes.')}
           </CardDescription>
         </Card>
       )}

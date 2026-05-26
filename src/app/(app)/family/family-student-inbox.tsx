@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { ParentLinkDto } from '@/lib/parent-links/service';
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 
 export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
   const router = useRouter();
+  const t = useT();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +40,7 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado');
+        setError(t('Error inesperado'));
       }
     } finally {
       setBusy(null);
@@ -48,11 +50,10 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
   return (
     <div className="mt-8 space-y-6">
       <Card>
-        <CardTitle>Solicitudes pendientes ({pending.length})</CardTitle>
+        <CardTitle>{t('Solicitudes pendientes ({n})', { n: pending.length })}</CardTitle>
         {pending.length === 0 ? (
           <CardDescription className="mt-3">
-            No tienes solicitudes pendientes. Cuando tu padre/madre/tutor pida vincularse a tu cuenta,
-            aparecerá aquí.
+            {t('No tienes solicitudes pendientes. Cuando tu padre/madre/tutor pida vincularse a tu cuenta, aparecerá aquí.')}
           </CardDescription>
         ) : (
           <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
@@ -74,7 +75,7 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
                     onClick={() => decide(l.id, 'approve')}
                     loading={busy === l.id + 'approve'}
                   >
-                    Aprobar
+                    {t('Aprobar')}
                   </Button>
                   <Button
                     size="sm"
@@ -82,7 +83,7 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
                     onClick={() => decide(l.id, 'reject')}
                     loading={busy === l.id + 'reject'}
                   >
-                    Rechazar
+                    {t('Rechazar')}
                   </Button>
                 </div>
               </li>
@@ -94,9 +95,9 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
 
       {approved.length > 0 && (
         <Card>
-          <CardTitle>Vínculos aprobados ({approved.length})</CardTitle>
+          <CardTitle>{t('Vínculos aprobados ({n})', { n: approved.length })}</CardTitle>
           <p className="mt-2 text-xs text-slate-500">
-            Las personas siguientes pueden ver tus cursos, notas y materiales.
+            {t('Las personas siguientes pueden ver tus cursos, notas y materiales.')}
           </p>
           <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
             {approved.map((l) => (
@@ -105,7 +106,7 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
                   <span className="font-medium">{l.parent.fullName}</span>{' '}
                   <span className="text-slate-500">· {l.parent.email}</span>
                 </span>
-                <Badge variant="success">APROBADO</Badge>
+                <Badge variant="success">{t('APROBADO')}</Badge>
               </li>
             ))}
           </ul>
@@ -114,7 +115,7 @@ export function FamilyStudentInbox({ initialLinks, currentUserId }: Props) {
 
       {past.length > 0 && (
         <Card>
-          <CardTitle>Histórico</CardTitle>
+          <CardTitle>{t('Histórico')}</CardTitle>
           <ul className="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
             {past.map((l) => (
               <li key={l.id} className="flex items-center justify-between py-2 text-sm">

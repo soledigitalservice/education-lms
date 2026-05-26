@@ -7,6 +7,7 @@ import { ParentLinksService } from '@/lib/parent-links/service';
 import { EnrollmentsService } from '@/lib/enrollments/service';
 import { GradesService } from '@/lib/grades/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { ApiError } from '@/lib/api/errors';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
@@ -53,12 +54,13 @@ export default async function ChildDetailPage({ params }: PageProps) {
 
   // Build a per-course grade average for quick parent insight.
   const avgByCourse = computeAverages(grades);
+  const t = getT();
 
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
         <Link href="/family" className="text-xs text-slate-500 hover:underline">
-          ← Familia
+          ← {t('Familia')}
         </Link>
         <h1 className="mt-1 text-2xl font-bold">{child.fullName}</h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -69,10 +71,12 @@ export default async function ChildDetailPage({ params }: PageProps) {
       </header>
 
       <section className="mt-8">
-        <h2 className="text-lg font-semibold">Cursos activos ({activeEnrollments.length})</h2>
+        <h2 className="text-lg font-semibold">
+          {t('Cursos activos ({n})', { n: activeEnrollments.length })}
+        </h2>
         {activeEnrollments.length === 0 ? (
           <Card className="mt-3">
-            <CardDescription>Sin cursos activos.</CardDescription>
+            <CardDescription>{t('Sin cursos activos.')}</CardDescription>
           </Card>
         ) : (
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,7 +91,8 @@ export default async function ChildDetailPage({ params }: PageProps) {
                       </p>
                       {avgByCourse[e.course.id] !== undefined && (
                         <p className="mt-3 text-sm">
-                          Media: <span className="font-bold">{avgByCourse[e.course.id]!.toFixed(1)}</span>
+                          {t('Media:')}{' '}
+                          <span className="font-bold">{avgByCourse[e.course.id]!.toFixed(1)}</span>
                         </p>
                       )}
                     </Card>
@@ -99,16 +104,20 @@ export default async function ChildDetailPage({ params }: PageProps) {
         )}
         {pendingEnrollments.length > 0 && (
           <p className="mt-3 text-xs text-slate-500">
-            {pendingEnrollments.length} solicitud(es) de inscripción pendiente(s).
+            {t('{n} solicitud(es) de inscripción pendiente(s).', { n: pendingEnrollments.length })}
           </p>
         )}
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold">Calificaciones recientes ({grades.length})</h2>
+        <h2 className="text-lg font-semibold">
+          {t('Calificaciones recientes ({n})', { n: grades.length })}
+        </h2>
         {grades.length === 0 ? (
           <Card className="mt-3">
-            <CardDescription>{child.fullName} aún no tiene calificaciones.</CardDescription>
+            <CardDescription>
+              {t('{name} aún no tiene calificaciones.', { name: child.fullName })}
+            </CardDescription>
           </Card>
         ) : (
           <div className="mt-3 space-y-3">
@@ -118,7 +127,7 @@ export default async function ChildDetailPage({ params }: PageProps) {
                   <div>
                     <p className="text-xs text-slate-500">
                       <Badge variant="default">
-                        {g.source.kind === 'submission' ? 'Tarea' : 'Cuestionario'}
+                        {g.source.kind === 'submission' ? t('Tarea') : t('Cuestionario')}
                       </Badge>{' '}
                       · {g.courseTitle}
                     </p>
