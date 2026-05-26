@@ -2,6 +2,7 @@ import { requireRole } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
 import { AdminStatsService } from '@/lib/admin-stats/service';
 import { Roles } from '@/lib/rbac/roles';
+import { getT } from '@/lib/i18n/server';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 
@@ -9,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminStatsPage() {
   await requireRole(Roles.ADMIN);
+  const t = getT();
   const svc = new AdminStatsService(prisma);
   const [overview, activity, engagement] = await Promise.all([
     svc.overview(),
@@ -27,64 +29,73 @@ export default async function AdminStatsPage() {
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Estadísticas</h1>
+        <h1 className="text-2xl font-bold">{t('Estadísticas')}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Salud global de la plataforma. Datos en tiempo real, no cacheados.
+          {t('Salud global de la plataforma. Datos en tiempo real, no cacheados.')}
         </p>
       </header>
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
-          label="Usuarios totales"
+          label={t('Usuarios totales')}
           value={overview.users.total}
           subtitle={Object.entries(overview.users.byRole)
             .map(([k, v]) => `${k.toLowerCase()}: ${v}`)
             .join(' · ')}
         />
         <Stat
-          label="Profesores pendientes"
+          label={t('Profesores pendientes')}
           value={overview.users.pendingTeachers}
-          subtitle="Esperando aprobación admin"
+          subtitle={t('Esperando aprobación admin')}
           highlight={overview.users.pendingTeachers > 0}
         />
         <Stat
-          label="Cursos publicados"
+          label={t('Cursos publicados')}
           value={overview.courses.published}
-          subtitle={`${overview.courses.draft} borradores · ${overview.courses.archived} archivados`}
+          subtitle={t('{d} borradores · {a} archivados', {
+            d: overview.courses.draft,
+            a: overview.courses.archived,
+          })}
         />
         <Stat
-          label="Inscripciones activas"
+          label={t('Inscripciones activas')}
           value={overview.enrollments.active}
-          subtitle={`${overview.enrollments.pending} pendientes`}
+          subtitle={t('{n} pendientes', { n: overview.enrollments.pending })}
         />
         <Stat
-          label="Tareas / submisiones"
+          label={t('Tareas / submisiones')}
           value={overview.assessments.assignments}
-          subtitle={`${overview.assessments.submissions} entregas · ${overview.assessments.gradedLast7d} calificadas en 7d`}
+          subtitle={t('{s} entregas · {g} calificadas en 7d', {
+            s: overview.assessments.submissions,
+            g: overview.assessments.gradedLast7d,
+          })}
         />
         <Stat
-          label="Contenido del curso"
+          label={t('Contenido del curso')}
           value={overview.content.lessons}
-          subtitle={`${overview.content.modules} módulos · ${overview.content.materials} materiales`}
+          subtitle={t('{m} módulos · {mat} materiales', {
+            m: overview.content.modules,
+            mat: overview.content.materials,
+          })}
         />
         <Stat
-          label="Mensajes (7 días)"
+          label={t('Mensajes (7 días)')}
           value={overview.realtime.chatMessagesLast7d}
-          subtitle="Actividad del chat"
+          subtitle={t('Actividad del chat')}
         />
         <Stat
-          label="Clases en vivo (30 días)"
+          label={t('Clases en vivo (30 días)')}
           value={overview.realtime.liveSessionsLast30d}
-          subtitle={`${overview.realtime.recordingsReady} grabaciones listas`}
+          subtitle={t('{n} grabaciones listas', { n: overview.realtime.recordingsReady })}
         />
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
-            <CardTitle>Engagement (últimos 30 días)</CardTitle>
+            <CardTitle>{t('Engagement (últimos 30 días)')}</CardTitle>
             <CardDescription className="mt-1">
-              Nuevos usuarios + inscripciones + entregas + mensajes por día.
+              {t('Nuevos usuarios + inscripciones + entregas + mensajes por día.')}
             </CardDescription>
             <div className="mt-4 flex h-40 items-end gap-1">
               {engagement.map((d) => {
@@ -113,9 +124,9 @@ export default async function AdminStatsPage() {
         </div>
 
         <Card>
-          <CardTitle>Actividad reciente</CardTitle>
+          <CardTitle>{t('Actividad reciente')}</CardTitle>
           <CardDescription className="mt-1">
-            Últimas 30 acciones del audit log.
+            {t('Últimas 30 acciones del audit log.')}
           </CardDescription>
           <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto text-xs">
             {activity.map((a) => (
@@ -126,7 +137,8 @@ export default async function AdminStatsPage() {
                 <Badge variant="default">{a.action}</Badge>
                 <div className="min-w-0 flex-1">
                   <p className="truncate">
-                    {a.actor ? <strong>{a.actor.fullName}</strong> : 'Sistema'} sobre {a.entity}
+                    {a.actor ? <strong>{a.actor.fullName}</strong> : t('Sistema')} {t('sobre')}{' '}
+                    {a.entity}
                   </p>
                   <p className="text-slate-500">
                     {new Date(a.createdAt).toLocaleString('es', {
@@ -138,7 +150,7 @@ export default async function AdminStatsPage() {
               </li>
             ))}
             {activity.length === 0 && (
-              <li className="text-slate-500">Sin actividad reciente.</li>
+              <li className="text-slate-500">{t('Sin actividad reciente.')}</li>
             )}
           </ul>
         </Card>

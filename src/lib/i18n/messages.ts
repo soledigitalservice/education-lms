@@ -432,4 +432,60 @@ export const en: Record<string, string> = {
   'In-app no puede desactivarse': 'In-app cannot be disabled',
   Guardado: 'Saved',
   'Guardar cambios': 'Save changes',
+
+  // ---- admin: users ----
+  'Administración de usuarios': 'User management',
+  'Aprobar profesores pendientes, ver y moderar usuarios.':
+    'Approve pending teachers, view and moderate users.',
+  'Profesores pendientes de aprobación': 'Teachers pending approval',
+  'No hay solicitudes pendientes.': 'No pending requests.',
+  '{n} solicitud(es) en espera.': '{n} request(s) waiting.',
+  'Usuarios recientes': 'Recent users',
+  '{n} total': '{n} total',
+  Nombre: 'Name',
+  Rol: 'Role',
+  Estado: 'Status',
+  'Mostrando los {n} usuarios más recientes de {total} totales. Para estadísticas globales y actividad reciente, visita':
+    'Showing the {n} most recent users of {total} total. For global statistics and recent activity, visit',
+  'el panel de estadísticas': 'the statistics dashboard',
+
+  // ---- admin: categories ----
+  'Crea, renombra y reorganiza el árbol de categorías de cursos.':
+    'Create, rename and reorganize the course category tree.',
+  Reglas: 'Rules',
+  'El slug debe ser único.': 'The slug must be unique.',
+  'Una categoría no puede ser ancestra de sí misma (no se permiten ciclos).':
+    'A category cannot be an ancestor of itself (cycles are not allowed).',
+  'No se puede eliminar una categoría que tenga cursos o subcategorías; reasígnalos primero.':
+    'You cannot delete a category that has courses or subcategories; reassign them first.',
+  'Nueva categoría': 'New category',
+  'Slug (opcional)': 'Slug (optional)',
+  'Categoría padre (opcional)': 'Parent category (optional)',
+  '— Raíz —': '— Root —',
+  'Categorías existentes ({n})': 'Existing categories ({n})',
+  'No hay categorías todavía.': 'No categories yet.',
+  hija: 'child',
+  '¿Eliminar esta categoría?': 'Delete this category?',
+
+  // ---- admin: stats ----
+  'Salud global de la plataforma. Datos en tiempo real, no cacheados.':
+    'Global platform health. Real-time data, not cached.',
+  'Esperando aprobación admin': 'Awaiting admin approval',
+  '{d} borradores · {a} archivados': '{d} drafts · {a} archived',
+  '{n} pendientes': '{n} pending',
+  'Tareas / submisiones': 'Assignments / submissions',
+  '{s} entregas · {g} calificadas en 7d': '{s} submissions · {g} graded in 7d',
+  '{m} módulos · {mat} materiales': '{m} modules · {mat} materials',
+  'Mensajes (7 días)': 'Messages (7 days)',
+  'Actividad del chat': 'Chat activity',
+  'Clases en vivo (30 días)': 'Live classes (30 days)',
+  '{n} grabaciones listas': '{n} recordings ready',
+  'Engagement (últimos 30 días)': 'Engagement (last 30 days)',
+  'Nuevos usuarios + inscripciones + entregas + mensajes por día.':
+    'New users + enrollments + submissions + messages per day.',
+  'Actividad reciente': 'Recent activity',
+  'Últimas 30 acciones del audit log.': 'Last 30 audit-log actions.',
+  Sistema: 'System',
+  sobre: 'on',
+  'Sin actividad reciente.': 'No recent activity.',
 };

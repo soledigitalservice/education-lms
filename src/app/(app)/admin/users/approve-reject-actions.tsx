@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 interface Props {
   teacherId: string;
@@ -12,6 +13,7 @@ interface Props {
 
 export function ApproveRejectActions({ teacherId }: Props) {
   const router = useRouter();
+  const t = useT();
   const [busy, setBusy] = useState<null | 'approve' | 'reject'>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +30,7 @@ export function ApproveRejectActions({ teacherId }: Props) {
       if (err instanceof HttpError) {
         setError(typeof err.body.message === 'string' ? err.body.message : err.body.message.join(', '));
       } else {
-        setError('Error inesperado');
+        setError(t('Error inesperado'));
       }
     } finally {
       setBusy(null);
@@ -45,7 +47,7 @@ export function ApproveRejectActions({ teacherId }: Props) {
           disabled={busy !== null}
           onClick={() => act('approve')}
         >
-          Aprobar
+          {t('Aprobar')}
         </Button>
         <Button
           size="sm"
@@ -54,7 +56,7 @@ export function ApproveRejectActions({ teacherId }: Props) {
           disabled={busy !== null}
           onClick={() => act('reject')}
         >
-          Rechazar
+          {t('Rechazar')}
         </Button>
       </div>
       {error ? <p className="text-xs text-red-600">{error}</p> : null}

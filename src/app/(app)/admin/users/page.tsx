@@ -3,6 +3,7 @@ import { requireRole } from '@/lib/auth/session';
 import { Roles } from '@/lib/rbac/roles';
 import { prisma } from '@/lib/prisma';
 import { UsersService } from '@/lib/users/service';
+import { getT } from '@/lib/i18n/server';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ApproveRejectActions } from './approve-reject-actions';
@@ -14,6 +15,7 @@ export default async function AdminUsersPage() {
   await requireRole(Roles.ADMIN);
 
   const users = new UsersService(prisma);
+  const t = getT();
   const [list, pending] = await Promise.all([
     users.list({ page: 1, pageSize: 25 }),
     users.listPendingTeachers(),
@@ -22,9 +24,9 @@ export default async function AdminUsersPage() {
   return (
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">Administración de usuarios</h1>
+        <h1 className="text-2xl font-bold">{t('Administración de usuarios')}</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Aprobar profesores pendientes, ver y moderar usuarios.
+          {t('Aprobar profesores pendientes, ver y moderar usuarios.')}
         </p>
       </header>
 
@@ -32,11 +34,11 @@ export default async function AdminUsersPage() {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Profesores pendientes de aprobación</CardTitle>
+              <CardTitle>{t('Profesores pendientes de aprobación')}</CardTitle>
               <CardDescription className="mt-1">
                 {pending.length === 0
-                  ? 'No hay solicitudes pendientes.'
-                  : `${pending.length} solicitud(es) en espera.`}
+                  ? t('No hay solicitudes pendientes.')
+                  : t('{n} solicitud(es) en espera.', { n: pending.length })}
               </CardDescription>
             </div>
             <Badge variant={pending.length === 0 ? 'success' : 'warning'}>
@@ -66,17 +68,17 @@ export default async function AdminUsersPage() {
 
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>Usuarios recientes</CardTitle>
-            <Badge>{list.total} total</Badge>
+            <CardTitle>{t('Usuarios recientes')}</CardTitle>
+            <Badge>{t('{n} total', { n: list.total })}</Badge>
           </div>
           <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
             <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
               <thead className="bg-slate-50 dark:bg-slate-800/50">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">Nombre</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">{t('Nombre')}</th>
                   <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">Email</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">Rol</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">Estado</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">{t('Rol')}</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">{t('Estado')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
@@ -106,10 +108,12 @@ export default async function AdminUsersPage() {
             </table>
           </div>
           <p className="mt-4 text-xs text-slate-500">
-            Mostrando los {list.items.length} usuarios más recientes de {list.total} totales. Para
-            estadísticas globales y actividad reciente, visita{' '}
+            {t(
+              'Mostrando los {n} usuarios más recientes de {total} totales. Para estadísticas globales y actividad reciente, visita',
+              { n: list.items.length, total: list.total },
+            )}{' '}
             <Link href="/admin/stats" className="text-brand-600 hover:underline">
-              el panel de estadísticas
+              {t('el panel de estadísticas')}
             </Link>
             .
           </p>
