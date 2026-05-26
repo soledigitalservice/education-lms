@@ -488,4 +488,47 @@ export const en: Record<string, string> = {
   Sistema: 'System',
   sobre: 'on',
   'Sin actividad reciente.': 'No recent activity.',
+
+  // ---- course form (new / edit) ----
+  'Nuevo curso': 'New course',
+  'Quedará en borrador hasta que pulses "Publicar".':
+    'It will stay as a draft until you click "Publish".',
+  'Editar curso': 'Edit course',
+  'Si lo dejas vacío, se genera a partir del título.':
+    'If left empty, it is generated from the title.',
+  'Resumen breve': 'Short summary',
+  Descripción: 'Description',
+  Categoría: 'Category',
+  'Sin categoría': 'No category',
+  'Empieza el': 'Starts on',
+  'Termina el': 'Ends on',
+  'Máx. alumnos (opcional)': 'Max students (optional)',
+  'Requiere aprobación del profesor': 'Requires teacher approval',
+
+  // ---- notifications bell view ----
+  Notificaciones: 'Notifications',
+  '{unread} sin leer · {total} total ·': '{unread} unread · {total} total ·',
+  'gestionar preferencias': 'manage preferences',
+  'Marcar todas como leídas': 'Mark all as read',
+  'Marcar leída': 'Mark read',
+  'Sin notificaciones': 'No notifications',
+  'Aquí aparecerán los avisos: tareas por vencer, calificaciones, mensajes, clases que empiezan, etc.':
+    'Notices will appear here: due assignments, grades, messages, classes starting, etc.',
+  'Cuenta aprobada': 'Account approved',
+  'Nueva inscripción': 'New enrollment',
+  'Nueva tarea': 'New assignment',
+  'Tarea por vencer': 'Assignment due soon',
+  'Clase empieza': 'Class starting',
+  Mensaje: 'Message',
+  'Solicitud padre': 'Parent request',
+  'Vínculo aprobado': 'Link approved',
+  'Respuesta foro': 'Forum reply',
+
+  // ---- enable push button ----
+  'No se pudo activar': "Couldn't enable",
+  '✓ Notificaciones push activas': '✓ Push notifications enabled',
+  'Permiso denegado en el navegador. Ajústalo en la configuración de notificaciones del sitio.':
+    "Permission denied in the browser. Adjust it in the site's notification settings.",
+  'Push bloqueado': 'Push blocked',
+  'Activar push': 'Enable push',
 };

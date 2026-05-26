@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT, useLocale } from '@/lib/i18n/client';
 import type { NotificationDto } from '@/lib/notifications/service';
 import { EnablePushButton } from './enable-push-button';
 
@@ -36,6 +37,9 @@ interface Props {
 
 export function NotificationsView({ initial, initialUnread }: Props) {
   const router = useRouter();
+  const t = useT();
+  const locale = useLocale();
+  const dateLocale = locale === 'en' ? 'en-US' : 'es';
   const [items, setItems] = useState<NotificationDto[]>(initial);
   const [unread, setUnread] = useState(initialUnread);
   const [busy, setBusy] = useState<string | null>(null);
@@ -73,14 +77,14 @@ export function NotificationsView({ initial, initialUnread }: Props) {
     <>
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Notificaciones</h1>
+          <h1 className="text-2xl font-bold">{t('Notificaciones')}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {unread} sin leer · {items.length} total ·{' '}
+            {t('{unread} sin leer · {total} total ·', { unread, total: items.length })}{' '}
             <Link
               href="/settings/notifications"
               className="font-medium text-brand-600 hover:underline"
             >
-              gestionar preferencias
+              {t('gestionar preferencias')}
             </Link>
           </p>
         </div>
@@ -93,7 +97,7 @@ export function NotificationsView({ initial, initialUnread }: Props) {
             disabled={unread === 0}
             loading={busy === 'all'}
           >
-            Marcar todas como leídas
+            {t('Marcar todas como leídas')}
           </Button>
         </div>
       </header>
@@ -102,10 +106,9 @@ export function NotificationsView({ initial, initialUnread }: Props) {
 
       {items.length === 0 ? (
         <Card className="mt-8">
-          <CardTitle>Sin notificaciones</CardTitle>
+          <CardTitle>{t('Sin notificaciones')}</CardTitle>
           <CardDescription className="mt-2">
-            Aquí aparecerán los avisos: tareas por vencer, calificaciones, mensajes, clases que
-            empiezan, etc.
+            {t('Aquí aparecerán los avisos: tareas por vencer, calificaciones, mensajes, clases que empiezan, etc.')}
           </CardDescription>
         </Card>
       ) : (
@@ -123,9 +126,9 @@ export function NotificationsView({ initial, initialUnread }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <Badge variant="default">{KIND_LABELS[n.kind] ?? n.kind}</Badge>
+                    <Badge variant="default">{t(KIND_LABELS[n.kind] ?? n.kind)}</Badge>
                     <span className="text-xs text-slate-500">
-                      {new Date(n.createdAt).toLocaleString('es', {
+                      {new Date(n.createdAt).toLocaleString(dateLocale, {
                         dateStyle: 'short',
                         timeStyle: 'short',
                       })}
@@ -145,7 +148,7 @@ export function NotificationsView({ initial, initialUnread }: Props) {
                       void markRead(n.id);
                     }}
                   >
-                    Marcar leída
+                    {t('Marcar leída')}
                   </Button>
                 )}
               </div>

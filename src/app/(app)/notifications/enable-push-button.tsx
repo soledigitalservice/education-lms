@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 
 type State =
   | { kind: 'loading' }
@@ -22,6 +23,7 @@ type State =
  * The button hides itself when not supported / configured so the UI stays clean.
  */
 export function EnablePushButton() {
+  const t = useT();
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +91,7 @@ export function EnablePushButton() {
       });
       setState({ kind: 'subscribed' });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo activar');
+      setError(err instanceof Error ? err.message : t('No se pudo activar'));
     } finally {
       setBusy(false);
     }
@@ -100,20 +102,23 @@ export function EnablePushButton() {
   }
   if (state.kind === 'subscribed') {
     return (
-      <span className="text-xs text-emerald-600">✓ Notificaciones push activas</span>
+      <span className="text-xs text-emerald-600">{t('✓ Notificaciones push activas')}</span>
     );
   }
   if (state.kind === 'denied') {
     return (
-      <span className="text-xs text-slate-500" title="Permiso denegado en el navegador. Ajústalo en la configuración de notificaciones del sitio.">
-        Push bloqueado
+      <span
+        className="text-xs text-slate-500"
+        title={t('Permiso denegado en el navegador. Ajústalo en la configuración de notificaciones del sitio.')}
+      >
+        {t('Push bloqueado')}
       </span>
     );
   }
   return (
     <div className="flex items-center gap-2">
       <Button size="sm" variant="secondary" onClick={enable} loading={busy}>
-        Activar push
+        {t('Activar push')}
       </Button>
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>
