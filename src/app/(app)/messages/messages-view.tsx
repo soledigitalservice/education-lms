@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { apiFetch } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import type { ChatRoomDto } from '@/lib/chat/service';
 import { ChatWindow } from './chat-window';
 import { NewDirectChatDialog } from './new-direct-chat';
@@ -25,6 +26,7 @@ export function MessagesView({
   initialRoomId,
 }: Props) {
   const router = useRouter();
+  const t = useT();
   const params = useSearchParams();
   const [rooms, setRooms] = useState<ChatRoomDto[]>(initialRooms);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(initialRoomId);
@@ -54,8 +56,8 @@ export function MessagesView({
     <>
       <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Mensajes</h1>
-          <Button onClick={() => setShowNewDirect(true)}>+ Nuevo chat</Button>
+          <h1 className="text-2xl font-bold">{t('Mensajes')}</h1>
+          <Button onClick={() => setShowNewDirect(true)}>{t('+ Nuevo chat')}</Button>
         </div>
       </header>
 
@@ -64,7 +66,7 @@ export function MessagesView({
           {rooms.length === 0 ? (
             <Card>
               <p className="text-sm text-slate-500">
-                Aún no tienes conversaciones. Pulsa &quot;+ Nuevo chat&quot; para empezar.
+                {t('Aún no tienes conversaciones. Pulsa "+ Nuevo chat" para empezar.')}
               </p>
             </Card>
           ) : (
@@ -95,7 +97,7 @@ export function MessagesView({
                       </span>
                       {r.lastMessage && (
                         <span className="truncate">
-                          {r.lastMessage.senderId === currentUserId ? 'Tú: ' : ''}
+                          {r.lastMessage.senderId === currentUserId ? t('Tú: ') : ''}
                           {r.lastMessage.body}
                         </span>
                       )}
@@ -118,7 +120,7 @@ export function MessagesView({
           ) : (
             <div className="flex h-full items-center justify-center p-12">
               <p className="text-sm text-slate-500">
-                Selecciona una conversación en la izquierda.
+                {t('Selecciona una conversación en la izquierda.')}
               </p>
             </div>
           )}

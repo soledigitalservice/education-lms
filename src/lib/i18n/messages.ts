@@ -531,4 +531,29 @@ export const en: Record<string, string> = {
     "Permission denied in the browser. Adjust it in the site's notification settings.",
   'Push bloqueado': 'Push blocked',
   'Activar push': 'Enable push',
+
+  // ---- messages / chat ----
+  '+ Nuevo chat': '+ New chat',
+  'Aún no tienes conversaciones. Pulsa "+ Nuevo chat" para empezar.':
+    'You have no conversations yet. Click "+ New chat" to start.',
+  'Tú: ': 'You: ',
+  'Selecciona una conversación en la izquierda.': 'Select a conversation on the left.',
+  'Nueva conversación': 'New conversation',
+  'Solo aparecen profesores y compañeros con los que compartes curso (o tus admins).':
+    'Only teachers and classmates you share a course with (or your admins) appear here.',
+  'Buscar por nombre o email...': 'Search by name or email...',
+  'Cargando…': 'Loading…',
+  'Nadie coincide con "{q}".': 'No one matches "{q}".',
+  Chatear: 'Chat',
+  '{n} participante(s)': '{n} participant(s)',
+  Conectado: 'Connected',
+  'Reconectando…': 'Reconnecting…',
+  '· Otro extremo conectado': '· Other side connected',
+  'Cargar mensajes anteriores': 'Load older messages',
+  'No hay mensajes todavía. Escribe el primero abajo.':
+    'No messages yet. Write the first one below.',
+  'Mensaje para {name}': 'Message to {name}',
+  Enviar: 'Send',
+  'Enter para enviar · Shift+Enter para salto de línea · {name}':
+    'Enter to send · Shift+Enter for a new line · {name}',
 };

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT } from '@/lib/i18n/client';
 import { ROLE_LABELS, type Role } from '@/lib/rbac/roles';
 
 interface Peer {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function NewDirectChatDialog({ onClose, onCreated }: Props) {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [peers, setPeers] = useState<Peer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,22 +79,22 @@ export function NewDirectChatDialog({ onClose, onCreated }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <h2 className="text-lg font-bold">Nueva conversación</h2>
+          <h2 className="text-lg font-bold">{t('Nueva conversación')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="text-2xl leading-none text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-            aria-label="Cerrar"
+            aria-label={t('Cerrar')}
           >
             ×
           </button>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Solo aparecen profesores y compañeros con los que compartes curso (o tus admins).
+          {t('Solo aparecen profesores y compañeros con los que compartes curso (o tus admins).')}
         </p>
 
         <Input
-          placeholder="Buscar por nombre o email..."
+          placeholder={t('Buscar por nombre o email...')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="mt-4"
@@ -102,10 +104,10 @@ export function NewDirectChatDialog({ onClose, onCreated }: Props) {
 
         <div className="mt-3 max-h-72 overflow-y-auto">
           {loading ? (
-            <p className="py-4 text-center text-sm text-slate-500">Cargando…</p>
+            <p className="py-4 text-center text-sm text-slate-500">{t('Cargando…')}</p>
           ) : filtered.length === 0 ? (
             <p className="py-4 text-center text-sm text-slate-500">
-              Nadie coincide con &quot;{query}&quot;.
+              {t('Nadie coincide con "{q}".', { q: query })}
             </p>
           ) : (
             <ul className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -114,7 +116,7 @@ export function NewDirectChatDialog({ onClose, onCreated }: Props) {
                   <div>
                     <p className="font-medium">{p.fullName}</p>
                     <p className="text-xs text-slate-500">
-                      {p.email} · <Badge variant="default">{ROLE_LABELS[p.role]}</Badge>
+                      {p.email} · <Badge variant="default">{t(ROLE_LABELS[p.role])}</Badge>
                     </p>
                   </div>
                   <Button
@@ -122,7 +124,7 @@ export function NewDirectChatDialog({ onClose, onCreated }: Props) {
                     onClick={() => startChat(p)}
                     loading={submittingFor === p.id}
                   >
-                    Chatear
+                    {t('Chatear')}
                   </Button>
                 </li>
               ))}

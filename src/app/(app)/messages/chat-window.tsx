@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { apiFetch, HttpError } from '@/lib/api/client';
+import { useT, useLocale } from '@/lib/i18n/client';
 import type { ChatMessageDto, ChatRoomDto } from '@/lib/chat/service';
 import { useChatRoom } from '@/lib/chat/use-chat-socket';
 
@@ -17,6 +18,9 @@ interface Props {
 }
 
 export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated }: Props) {
+  const t = useT();
+  const locale = useLocale();
+  const dateLocale = locale === 'en' ? 'en-US' : 'es';
   const [messages, setMessages] = useState<ChatMessageDto[]>([]);
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
@@ -132,20 +136,20 @@ export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated
           </p>
           <p className="flex items-center gap-2 text-xs text-slate-500">
             <Badge variant="default">{room.kind}</Badge>
-            <span>{room.participantCount} participante(s)</span>
+            <span>{t('{n} participante(s)', { n: room.participantCount })}</span>
             {connected ? (
               <span className="flex items-center gap-1">
                 <span className="size-1.5 rounded-full bg-emerald-500" />
-                Conectado
+                {t('Conectado')}
               </span>
             ) : (
               <span className="flex items-center gap-1 text-amber-600">
                 <span className="size-1.5 rounded-full bg-amber-500" />
-                Reconectando…
+                {t('Reconectando…')}
               </span>
             )}
             {otherOnline.length > 0 && room.kind === 'DIRECT' && (
-              <span className="text-emerald-600">· Otro extremo conectado</span>
+              <span className="text-emerald-600">{t('· Otro extremo conectado')}</span>
             )}
           </p>
         </div>
@@ -155,15 +159,15 @@ export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated
         {hasMore && messages.length > 0 && (
           <div className="flex justify-center">
             <Button size="sm" variant="ghost" onClick={loadOlder}>
-              Cargar mensajes anteriores
+              {t('Cargar mensajes anteriores')}
             </Button>
           </div>
         )}
         {loadingHistory ? (
-          <p className="text-center text-sm text-slate-500">Cargando…</p>
+          <p className="text-center text-sm text-slate-500">{t('Cargando…')}</p>
         ) : messages.length === 0 ? (
           <p className="py-12 text-center text-sm text-slate-500">
-            No hay mensajes todavía. Escribe el primero abajo.
+            {t('No hay mensajes todavía. Escribe el primero abajo.')}
           </p>
         ) : (
           messages.map((m) => {
@@ -188,7 +192,7 @@ export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated
                       (mine ? 'text-white/70' : 'text-slate-500 dark:text-slate-400')
                     }
                   >
-                    {new Date(m.createdAt).toLocaleTimeString('es', {
+                    {new Date(m.createdAt).toLocaleTimeString(dateLocale, {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
@@ -205,7 +209,9 @@ export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated
         <div className="flex items-end gap-2">
           <textarea
             className="min-h-12 flex-1 resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
-            placeholder={`Mensaje para ${room.kind === 'DIRECT' ? room.otherParticipant?.fullName ?? '?' : room.name}`}
+            placeholder={t('Mensaje para {name}', {
+              name: room.kind === 'DIRECT' ? room.otherParticipant?.fullName ?? '?' : room.name ?? '',
+            })}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onKeyDown={(e) => {
@@ -218,11 +224,13 @@ export function ChatWindow({ room, currentUserId, currentUserName, onRoomUpdated
             disabled={sending}
           />
           <Button onClick={send} loading={sending} disabled={!body.trim()}>
-            Enviar
+            {t('Enviar')}
           </Button>
         </div>
         <p className="mt-1 text-[10px] text-slate-500">
-          Enter para enviar · Shift+Enter para salto de línea · {currentUserName}
+          {t('Enter para enviar · Shift+Enter para salto de línea · {name}', {
+            name: currentUserName,
+          })}
         </p>
       </footer>
     </div>
