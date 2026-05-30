@@ -556,4 +556,12 @@ export const en: Record<string, string> = {
   Enviar: 'Send',
   'Enter para enviar · Shift+Enter para salto de línea · {name}':
     'Enter to send · Shift+Enter for a new line · {name}',
+
+  // ---- admin: create user ----
+  'Si necesitas una cuenta, pídela a un administrador.':
+    'If you need an account, ask an administrator.',
+  '+ Nuevo usuario': '+ New user',
+  'Crear usuario': 'Create user',
+  'El nuevo usuario quedará activo de inmediato. Comunícale su correo y contraseña por un canal seguro.':
+    'The new user will be active immediately. Share their email and password through a secure channel.',
 };

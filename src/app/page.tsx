@@ -27,15 +27,9 @@ export default async function HomePage() {
           <LanguageToggle className="mr-1" />
           <Link
             href="/login"
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            {t('Iniciar sesión')}
-          </Link>
-          <Link
-            href="/register"
             className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-brand-700"
           >
-            {t('Crear cuenta')}
+            {t('Iniciar sesión')}
           </Link>
         </nav>
       </header>
@@ -55,14 +49,8 @@ export default async function HomePage() {
         </p>
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
           <Link
-            href="/register"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-7 py-3 text-base font-medium text-white shadow-md transition hover:bg-brand-700 sm:w-auto"
-          >
-            {t('Crear cuenta')}
-          </Link>
-          <Link
             href="/login"
-            className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-7 py-3 text-base font-medium text-slate-900 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:w-auto"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-7 py-3 text-base font-medium text-white shadow-md transition hover:bg-brand-700 sm:w-auto"
           >
             {t('Iniciar sesión')}
           </Link>

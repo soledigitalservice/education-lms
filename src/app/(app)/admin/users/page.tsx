@@ -6,6 +6,7 @@ import { UsersService } from '@/lib/users/service';
 import { getT } from '@/lib/i18n/server';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ApproveRejectActions } from './approve-reject-actions';
 
 // Render fresh on every request — admin moderation is dynamic.
@@ -23,11 +24,16 @@ export default async function AdminUsersPage() {
 
   return (
     <>
-      <header className="border-b border-slate-200 pb-6 dark:border-slate-800">
-        <h1 className="text-2xl font-bold">{t('Administración de usuarios')}</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {t('Aprobar profesores pendientes, ver y moderar usuarios.')}
-        </p>
+      <header className="flex flex-col items-start justify-between gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-end">
+        <div>
+          <h1 className="text-2xl font-bold">{t('Administración de usuarios')}</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {t('Aprobar profesores pendientes, ver y moderar usuarios.')}
+          </p>
+        </div>
+        <Link href="/admin/users/new">
+          <Button>{t('+ Nuevo usuario')}</Button>
+        </Link>
       </header>
 
       <section className="mt-8 space-y-6">

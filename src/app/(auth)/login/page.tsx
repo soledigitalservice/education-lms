@@ -53,10 +53,7 @@ export default function LoginPage() {
     <>
       <h1 className="text-2xl font-bold tracking-tight">{t('Iniciar sesión')}</h1>
       <p className="mt-2 text-sm text-slate-500">
-        {t('¿No tienes cuenta?')}{' '}
-        <Link href="/register" className="font-medium text-brand-600 hover:underline">
-          {t('Crear una')}
-        </Link>
+        {t('Si necesitas una cuenta, pídela a un administrador.')}
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
