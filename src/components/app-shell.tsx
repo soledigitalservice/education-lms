@@ -22,13 +22,13 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { href: '/dashboard', label: 'Inicio' },
-  { href: '/courses', label: 'Catálogo' },
+  { href: '/courses', label: 'Catálogo', roles: [Roles.ADMIN] },
   { href: '/my/courses', label: 'Mis cursos' },
   { href: '/my/grades', label: 'Mis notas', roles: [Roles.STUDENT] },
   { href: '/family', label: 'Familia', roles: [Roles.PARENT, Roles.STUDENT] },
   { href: '/messages', label: 'Mensajes' },
   { href: '/calendar', label: 'Calendario' },
-  { href: '/settings/notifications', label: 'Ajustes' },
+  { href: '/settings/notifications', label: 'Ajustes', roles: [Roles.ADMIN] },
   { href: '/admin/users', label: 'Usuarios', roles: [Roles.ADMIN] },
   { href: '/admin/categories', label: 'Categorías', roles: [Roles.ADMIN] },
   { href: '/admin/stats', label: 'Estadísticas', roles: [Roles.ADMIN] },

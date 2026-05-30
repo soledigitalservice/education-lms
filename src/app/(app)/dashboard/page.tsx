@@ -346,10 +346,10 @@ async function StudentDashboard({ userId }: { userId: string }) {
         <QuickActions
           role="student"
           items={[
-            { href: '/courses', label: t('Explorar catálogo'), primary: true },
-            { href: '/my/courses', label: t('Mis cursos') },
+            { href: '/my/courses', label: t('Mis cursos'), primary: true },
             { href: '/my/grades', label: t('Mis notas') },
             { href: '/calendar', label: t('Calendario') },
+            { href: '/messages', label: t('Mensajes') },
           ]}
         />
 
@@ -569,7 +569,6 @@ async function ParentDashboard({ userId }: { userId: string }) {
           role="parent"
           items={[
             { href: '/family', label: t('Familia'), primary: true },
-            { href: '/courses', label: t('Catálogo') },
             { href: '/calendar', label: t('Calendario') },
             { href: '/messages', label: t('Mensajes') },
           ]}

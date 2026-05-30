@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { requireSession } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
@@ -19,6 +20,8 @@ interface PageProps {
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const user = await requireSession();
+  // Catalog is admin-only by client request.
+  if (user.role !== Roles.ADMIN) redirect('/dashboard');
   const t = getT();
 
   const q = listCoursesQuerySchema.parse({
