@@ -4,6 +4,7 @@ import { Role, EnrollmentStatus, SubmissionStatus, LiveSessionStatus } from '@pr
 import { requireSession } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { RecentGradesPager } from './recent-grades-pager';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ROLE_LABELS } from '@/lib/rbac/roles';
@@ -269,7 +270,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
     }),
     prisma.grade.findMany({
       where: { studentId: userId },
-      take: 5,
+      take: 20,
       orderBy: { gradedAt: 'desc' },
       include: {
         submission: {
@@ -396,7 +397,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
       <section className="grid gap-6 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
-            <CardTitle>{t('Notas recientes')}</CardTitle>
+            <CardTitle>{t('Notas')}</CardTitle>
             <Link
               href="/my/grades"
               className="text-xs font-medium text-brand-600 hover:underline"
@@ -404,29 +405,7 @@ async function StudentDashboard({ userId }: { userId: string }) {
               {t('Ver todas →')}
             </Link>
           </div>
-          {recentGrades.length === 0 ? (
-            <CardDescription className="mt-3">
-              {t('Aún no tienes notas. Cuando el profesor califique tu primera entrega aparecerá aquí.')}
-            </CardDescription>
-          ) : (
-            <ul className="mt-4 space-y-2">
-              {recentGrades.map((g) => (
-                <li
-                  key={g.id}
-                  className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-800"
-                >
-                  <span className="min-w-0 truncate">
-                    {g.submission?.assignment.title ?? t('Cuestionario')}
-                  </span>
-                  <span className="font-medium">
-                    {g.numericValue != null && g.submission
-                      ? `${g.numericValue} / ${g.submission.assignment.maxScore}`
-                      : g.conceptValue ?? g.letterValue ?? '—'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <RecentGradesPager grades={recentGrades} />
         </Card>
 
         <Card>

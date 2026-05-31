@@ -557,6 +557,11 @@ export const en: Record<string, string> = {
   'Enter para enviar · Shift+Enter para salto de línea · {name}':
     'Enter to send · Shift+Enter for a new line · {name}',
 
+  // ---- recent grades pager ----
+  Notas: 'Grades',
+  Anterior: 'Previous',
+  Siguiente: 'Next',
+
   // ---- admin: create user ----
   'Si necesitas una cuenta, pídela a un administrador.':
     'If you need an account, ask an administrator.',
